@@ -2,8 +2,10 @@
 
 namespace Database\Seeders;
 
+use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
@@ -15,10 +17,9 @@ class RolesAndPermissionsSeeder extends Seeder
     public function run(): void
     {
         ///crete roles
-        $adminRole = Role::firstOrCreate(['name' => 'admin']);
-        $citizenRole = Role::firstOrCreate(['name' => 'citizen']);
-        $employeeRole = Role::firstOrCreate(['name' => 'employee']);
-
+        $adminRole = Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'api']);
+        $citizenRole = Role::firstOrCreate(['name' => 'citizen', 'guard_name' => 'api']);
+        $employeeRole = Role::firstOrCreate(['name' => 'employee', 'guard_name' => 'api']);
         ///create permissions
         $permissions = [
             // Citizen
@@ -46,7 +47,10 @@ class RolesAndPermissionsSeeder extends Seeder
         ];
 
         foreach ($permissions as $permission) {
-            Permission::firstOrCreate(['name' => $permission]);
+            Permission::firstOrCreate([
+                'name' => $permission,
+                'guard_name' => 'api'
+            ]);
         }
 
         $citizenPermisson = [
@@ -68,6 +72,17 @@ class RolesAndPermissionsSeeder extends Seeder
         $adminRole->syncPermissions(Permission::all());
         $citizenRole->syncPermissions($citizenPermisson);
         $employeeRole->syncPermissions($employeePermisson);
+
+        // Create example admin
+        $admin = User::firstOrCreate(
+            ['email' => 'admin@example.com'],
+            [
+                'name' => 'Super Admin',
+                'password' => Hash::make('password123'),
+                'email_verified_at' => now()
+            ]
+        );
+        $admin->assignRole('admin');
 
     }
 }

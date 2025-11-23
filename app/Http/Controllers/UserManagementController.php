@@ -1,0 +1,73 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\UpdateUserRequest;
+use App\Http\Responses\Response;
+use App\Services\UserManagementService;
+use Illuminate\Http\Request;
+
+class UserManagementController extends Controller
+{
+    protected $service;
+
+    public function __construct(UserManagementService $service)
+    {
+        $this->service = $service;
+
+    }
+
+
+    public function index()
+    {
+        $users = $this->service->list();
+        return Response::Success($users,'users list',200);
+    }
+
+
+    public function show($id)
+    {
+        $user = $this->service->find($id);
+        if (!$user) {
+            return Response::error(null,'User not found',404);
+        }
+        return Response::Success($user,'user',200);
+    }
+
+    public function store(StoreUserRequest $request)
+    {
+        $data = $request->validated();
+
+        $user = $this->service->create($data);
+
+        return Response::Success($user,'user created',201);
+    }
+
+
+    public function update(UpdateUserRequest $request, $id)
+    {
+        $data = $request->validated();
+
+        $user = $this->service->update($id, $data);
+
+        if (!$user) {
+            return Response::error(null,'User not found',404);
+
+        }
+
+        return Response::Success($user,'user',200);
+    }
+
+
+    public function destroy($id)
+    {
+        $deleted = $this->service->delete($id);
+
+        if (!$deleted) {
+            return Response::error(null,'User not found',404);
+        }
+        return Response::Success(null,'User has been deleted',200);
+
+    }
+}

@@ -20,11 +20,15 @@ class User extends Authenticatable implements JWTSubject
      *
      * @var list<string>
      */
+
+    protected $guard_name = 'api';
+
     protected $fillable = [
         'name',
         'email',
         'password',
-        'email_verified_at'
+        'email_verified_at',
+        'department_id'
     ];
 
     /**
@@ -68,6 +72,12 @@ class User extends Authenticatable implements JWTSubject
             'permissions' => $this->getAllPermissions()->pluck('name')
         ];
     }
+
+    public function department(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Department::class);
+    }
+
 
 
 }

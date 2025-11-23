@@ -56,6 +56,13 @@ class AuthService
     public function login(array $data, string $requiredRole): array
     {
         $user = $this->users->findByEmail($data['email']);
+        if (!$user) {
+            return [
+                'user' => null,
+                'message' => 'Invalid email or password',
+                'code' => 401
+            ];
+        }
         if ($user->locked_until && now()->lt($user->locked_until)) {
             return [
                 'user' => null,

@@ -3,7 +3,9 @@
 namespace App\Providers;
 
 use App\Repositories\Contracts\ComplaintRepositoryInterface;
+use App\Repositories\Contracts\PermissionRepositoryInterface;
 use App\Repositories\Eloquent\ComplaintRepository;
+use App\Repositories\Eloquent\PermissionRepository;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -21,6 +23,26 @@ class AppServiceProvider extends ServiceProvider
             ComplaintRepositoryInterface::class,
             ComplaintRepository::class
         );
+        $this->app->bind(
+            \App\Repositories\Contracts\DepartmentRepositoryInterface::class,
+            \App\Repositories\Eloquent\DepartmentRepository::class
+        );
+
+        $this->app->bind(
+            \App\Repositories\Contracts\EmployeeRepositoryInterface::class,
+            \App\Repositories\Eloquent\EmployeeRepository::class
+        );
+        $this->app->bind(
+            \App\Repositories\Contracts\UserManagementRepositoryInterface::class,
+            \App\Repositories\Eloquent\UserManagementRepository::class
+        );
+
+        $this->app->bind(
+            PermissionRepositoryInterface::class,
+            PermissionRepository::class
+        );
+
+
     }
 
     /**
