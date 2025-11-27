@@ -36,6 +36,10 @@ class AppServiceProvider extends ServiceProvider
             \App\Repositories\Contracts\UserManagementRepositoryInterface::class,
             \App\Repositories\Eloquent\UserManagementRepository::class
         );
+        $this->app->bind(
+            \App\Repositories\Contracts\ComplaintStatusRepositoryInterface::class,
+            \App\Repositories\Eloquent\ComplaintStatusRepository::class,
+        );
 
         $this->app->bind(
             PermissionRepositoryInterface::class,

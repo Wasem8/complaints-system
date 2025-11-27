@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
-
+use App\Http\Controllers\ComplaintController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -16,5 +16,22 @@ Route::prefix('employee')->group(function (){
 
 Route::prefix('employee')->middleware(['auth:api', 'role:employee'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
+    Route::get(
+        '/complaints',
+        [ComplaintController::class, 'index']
+    );
+    Route::post(
+        '/complaints/{id}/status',
+        [ComplaintController::class, 'updateStatus']
+    );
+
+    Route::post(
+        '/complaints/{id}/notes',
+        [ComplaintController::class, 'addNote']
+    );
+    Route::post(
+        '/complaints/{id}/request-info',
+        [ComplaintController::class, 'requestMoreInfo']
+    );
 });
 

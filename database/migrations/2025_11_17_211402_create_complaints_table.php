@@ -22,14 +22,7 @@ return new class extends Migration
                 'employee_misconduct',
                 'technical_issue'
             ]);
-
-            $table->enum('authority', [
-                'municipality',
-                'electric_company',
-                'water_authority',
-                'health_directorate',
-                'other'
-            ]);
+            $table->foreignId('department_id')->constrained('departments')->cascadeOnDelete();
 
             $table->text('description');
             $table->string('location_text')->nullable();

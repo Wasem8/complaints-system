@@ -21,5 +21,6 @@ Route::prefix('citizen')->middleware(['auth:api', 'role:citizen'])->group(functi
     Route::post('/email-verification',[AuthController::class,'emailVerification']);
     Route::get('/email-verification',[AuthController::class,'sendEmailVerification']);
     Route::post('/complaints', [ComplaintController::class, 'store']);
+    Route::get('/Complaint-status/{id}',[ComplaintController::class,'show']);
 });
 

@@ -37,8 +37,8 @@ class AuthService
         'password' => Hash::make($data['password']),
     ]);
 
-            $roleModel = Role::findByName($role);
-            $user->assignRole($roleModel);
+        $roleModel = Role::findByName($role, 'api');
+        $user->assignRole($roleModel);
 
         $tokens = $this->tokens->createTokens($user);
         $user->notify(new EmailVerificationNotification());

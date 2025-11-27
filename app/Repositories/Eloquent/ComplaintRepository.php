@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use App\Repositories\Contracts\ComplaintRepositoryInterface;
+use Illuminate\Support\Collection;
 
 class ComplaintRepository implements ComplaintRepositoryInterface
 {
@@ -38,5 +39,21 @@ class ComplaintRepository implements ComplaintRepositoryInterface
     private function generateTrackingNumber(): string
     {
         return 'CMP-' . now()->format('YmdHis') . '-' . strtoupper(Str::random(6));
+    }
+
+    public function find(int $id): ?Complaint
+    {
+        return Complaint::with('statusLogs', 'files')->find($id);
+    }
+    public function getByDepartment(int $departmentId): Collection
+    {
+        return Complaint::with('user','statusLogs')
+        ->where('department_id',$departmentId)
+        ->orderBy('created_at')
+        ->get();
+    }
+    public function update(int $id, array $data): bool
+    {
+        return Complaint::where('id', $id)->update($data);
     }
 }

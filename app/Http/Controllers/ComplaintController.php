@@ -4,17 +4,26 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ComplaintRequest;
+use App\Http\Requests\UpdateStatusRequest;
+use App\Http\Responses\Response;
 use App\Services\ComplaintService;
+use App\Services\ComplaintStatusService;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\Request;
 
 class ComplaintController extends Controller
 {
-    public function __construct(private ComplaintService $service) {}
+    public function __construct(
+        private ComplaintService $service,
+        private ComplaintStatusService $statusService,
+    ) {}
+
 
     public function store(ComplaintRequest $request)
     {
         $data = $request->only([
             'type',
-            'authority',
+            'department_id',
             'description',
             'location_text',
         ]);
@@ -28,5 +37,87 @@ class ComplaintController extends Controller
         $result = $this->service->submit($data, $files ?? []);
 
         return response()->json($result, $result['status'] ? 201 : 400);
+    }
+
+    public function index()
+    {
+        $complaints = $this->service->getDepartmentComplaints();
+
+        return response()->json([
+            'success' => true,
+            'data' => $complaints
+        ]);
+    }
+
+    public function show(int $id) {
+        try {
+            $data = $this->statusService->getStatusTimeLine($id);
+
+            return Response::Success([
+                'status'  => 1,
+                'message' => 'Complaint status',
+                'data'    => $data,
+            ], 200);
+        } catch (ModelNotFoundException $e) {
+            return Response::Error([
+                'status'  => 0,
+                'message' => 'Complaint not found',
+                'data'    => null,
+            ], 404);
+        }
+    }
+    public function updateStatus(UpdateStatusRequest $request, int $id)
+    {
+
+
+        $this->service->updateStatus(
+            $id,
+            $request->status,
+            $request->note
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => 'تم تحديث حالة الشكوى بنجاح'
+        ]);
+    }
+    public function addNote(Request $request, int $id)
+    {
+        $request->validate([
+            'note' => 'required|string'
+        ]);
+
+       $data =  $this->service->addNote($id, $request->note);
+
+        return Response::Success([
+            'data'=> $data,
+            'message' => 'تم اضافة ملاحضة بنجاح',
+            'code' => 1,
+        ],200);
+    }
+
+    public function requestMoreInfo(Request $request, int $complaintId)
+    {
+        $request->validate([
+            'message' => 'required|string|max:5000',
+        ]);
+        try {
+          $data = $this->service->requestMoreInfo(
+                $complaintId,
+                $request->message
+            );
+
+            return Response::Success([
+                'data'=> $data,
+                'message'=>'you need more info to complaint',
+                'code'=> 1,
+            ],200);
+        } catch (\Exception $e) {
+            return Response::Error([
+                'data'=> null,
+                'message' => $e->getMessage(),
+                'code' => 0,
+            ],400);
+        }
     }
 }
