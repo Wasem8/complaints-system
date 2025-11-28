@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\ComplaintController;
 use App\Http\Controllers\AuthController;
 
 use App\Http\Controllers\DepartmentController;
@@ -42,5 +43,21 @@ Route::prefix('admin')->middleware(['auth:api', 'role:admin'])->group(function (
     Route::post('/permissions', [PermissionController::class, 'createPermission']);
 
     Route::post('/roles/{role}/assign', [PermissionController::class, 'assignPermissions']);
+
+
+
+
+
+
+
+    Route::get('/complaints', [ComplaintController::class, 'index']);
+    Route::get('/complaints/{id}', [ComplaintController::class, 'show']);
+
+    Route::put('/complaints/{id}/status', [ComplaintController::class, 'updateStatus']);
+    Route::post('/complaints/{id}/notes', [ComplaintController::class, 'addNote']);
+
+    Route::get('/complaints/{id}/timeline', [ComplaintController::class, 'timeline']);
+
+    Route::put('/complaints/{id}/archive', [ComplaintController::class, 'archive']);
 });
 

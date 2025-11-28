@@ -37,7 +37,7 @@ class AuthService
         'password' => Hash::make($data['password']),
     ]);
 
-            $roleModel = Role::findByName($role);
+            $roleModel = Role::findByName($role,'api');
             $user->assignRole($roleModel);
 
         $tokens = $this->tokens->createTokens($user);
