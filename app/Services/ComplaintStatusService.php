@@ -29,7 +29,7 @@ class ComplaintStatusService
                     'note'   => $log->note,
                 ];
             }),
-            'last_update' => $logs->last()?->note
+            'last_update' => $logs->last()?->new_status
         ];
 
     }

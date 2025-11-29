@@ -8,8 +8,10 @@ use App\Notifications\ComplaintNoteAdded;
 use App\Notifications\ComplaintStatusUpdated;
 use App\Repositories\Contracts\ComplaintRepositoryInterface;
 use App\Repositories\Contracts\ComplaintStatusRepositoryInterface;
+use Illuminate\Container\Attributes\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Contracts\Cache\LockTimeoutException;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Str;
 
@@ -111,6 +113,17 @@ class ComplaintService
             );
         }
         return true;
+    }
+
+    public function getComplaintsForCitizen(): Collection
+    {
+        $citizenId = auth()->id();
+
+        if(is_null($citizenId)) {
+            return collect();
+
+        }
+        return $this->repo->getuserComplaints($citizenId);
     }
 
 

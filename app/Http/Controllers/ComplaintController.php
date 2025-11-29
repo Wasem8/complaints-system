@@ -107,17 +107,16 @@ class ComplaintController extends Controller
                 $request->message
             );
 
-            return Response::Success([
-                'data'=> $data,
-                'message'=>'you need more info to complaint',
-                'code'=> 1,
-            ],200);
+            return Response::Success($data,'you need more info to complaint',200);
         } catch (\Exception $e) {
-            return Response::Error([
-                'data'=> null,
-                'message' => $e->getMessage(),
-                'code' => 0,
-            ],400);
+            return Response::Error(null, $e->getMessage(),400);
         }
+    }
+
+    public function getAllcomplaint() {
+
+        $complaints = $this->service->getComplaintsForCitizen();
+        
+        return Response::Success($complaints,'complaints get successfully',200);
     }
 }

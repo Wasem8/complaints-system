@@ -2,7 +2,8 @@
 
 use App\Http\Controllers\ComplaintController;
 use App\Http\Controllers\AuthController;
-
+use App\Http\Controllers\ComplaintTypeController;
+use App\Http\Controllers\DepartmentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -22,5 +23,8 @@ Route::prefix('citizen')->middleware(['auth:api', 'role:citizen'])->group(functi
     Route::get('/email-verification',[AuthController::class,'sendEmailVerification']);
     Route::post('/complaints', [ComplaintController::class, 'store']);
     Route::get('/Complaint-status/{id}',[ComplaintController::class,'show']);
+    Route::get('complaints',[ComplaintController::class, 'getAllcomplaint']);
+    Route::get('departments',[DepartmentController::class,'index']);
+    Route::get('types',[ComplaintTypeController::class,'index']);
 });
 

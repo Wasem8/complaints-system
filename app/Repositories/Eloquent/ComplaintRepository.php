@@ -56,4 +56,11 @@ class ComplaintRepository implements ComplaintRepositoryInterface
     {
         return Complaint::where('id', $id)->update($data);
     }
+
+    public function getuserComplaints(int $userId): Collection
+    {
+        return Complaint::where('user_id',$userId)
+        ->orderBy('created_at')
+        ->get();
+    }
 }
