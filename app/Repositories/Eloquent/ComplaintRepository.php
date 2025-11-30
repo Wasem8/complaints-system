@@ -47,7 +47,7 @@ class ComplaintRepository implements ComplaintRepositoryInterface
     }
     public function getByDepartment(int $departmentId): Collection
     {
-        return Complaint::with('user','statusLogs')
+        return Complaint::with('user','statusLogs','files')
         ->where('department_id',$departmentId)
         ->orderBy('created_at')
         ->get();
