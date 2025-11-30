@@ -60,6 +60,7 @@ class ComplaintRepository implements ComplaintRepositoryInterface
     public function getuserComplaints(int $userId): Collection
     {
         return Complaint::where('user_id',$userId)
+        ->with('files')
         ->orderBy('created_at')
         ->get();
     }

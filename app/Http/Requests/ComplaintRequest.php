@@ -35,7 +35,7 @@ class ComplaintRequest extends FormRequest
             'description' => ['required', 'string', 'min:20'],
             'location_text' => ['nullable', 'string'],
 
-            'files.*' => ['file', 'mimes:jpg,jpeg,png,pdf,mp4', 'max:5120']
+            'files.*' => ['file', 'mimes:jpg,jpeg,png,pdf,mp4', 'max:10240']
 
 
         ];
