@@ -31,13 +31,7 @@ class ComplaintRequest extends FormRequest
                 'employee_misconduct',
                 'technical_issue'
             ])],
-            'authority' => ['required', Rule::in([
-                'municipality',
-                'electric_company',
-                'water_authority',
-                'health_directorate',
-                'other'
-            ])],
+            'department_id' => ['required'],
             'description' => ['required', 'string', 'min:20'],
             'location_text' => ['nullable', 'string'],
 

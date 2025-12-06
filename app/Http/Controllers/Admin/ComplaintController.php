@@ -37,25 +37,10 @@ class ComplaintController extends Controller
         $data = $this->service->updateStatus($id, $request->status);
         if (!$data) return Response::error(null, "Complaint not found", 404);
 
-        return Response::success($data, "Status updated");
+        return Response::success($data, "Status");
     }
 
-    public function addNote(Request $request, $id)
-    {
-        $request->validate([
-            'note' => 'required|string',
-        ]);
 
-        $note = [
-            'note' => $request->note,
-            'user_id' => auth()->id(),
-        ];
-
-        $data = $this->service->addNote($id, $note);
-        if (!$data) return Response::error(null, "Complaint not found", 404);
-
-        return Response::success($data, "Note added");
-    }
 
     public function timeline($id)
     {
@@ -63,15 +48,8 @@ class ComplaintController extends Controller
 
         if (!$data) return Response::error(null, "Complaint not found", 404);
 
-        return Response::success($data);
+        return Response::success($data,'success');
     }
 
-    public function archive($id)
-    {
-        $data = $this->service->archive($id);
 
-        if (!$data) return Response::error(null, "Complaint not found", 404);
-
-        return Response::success(null, "Complaint archived");
-    }
 }

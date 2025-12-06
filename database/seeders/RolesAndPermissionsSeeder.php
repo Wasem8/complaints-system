@@ -84,5 +84,17 @@ class RolesAndPermissionsSeeder extends Seeder
         );
         $admin->assignRole('admin');
 
+
+        $employee = User::firstOrCreate(
+            ['email' => 'aboudowais9@gmail.com'],
+            [
+                'name' => 'Adimn',
+                'password' =>Hash::make('password123'),
+                'email_verified_at' => now(),
+
+            ]
+            );
+            $employee->assignRole('employee');
+
     }
 }

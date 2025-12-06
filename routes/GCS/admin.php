@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\ComplaintController;
+use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\AuthController;
 
 use App\Http\Controllers\DepartmentController;
@@ -13,6 +14,11 @@ use Illuminate\Support\Facades\Route;
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
+
+Route::get('/health', function () {
+    return response()->json(['status' => 'healthy']);
+});
+
 
 Route::prefix('admin')->group(function (){
     Route::post('/login',[AuthController::class,'loginAdmin']);
@@ -54,10 +60,20 @@ Route::prefix('admin')->middleware(['auth:api', 'role:admin'])->group(function (
     Route::get('/complaints/{id}', [ComplaintController::class, 'show']);
 
     Route::put('/complaints/{id}/status', [ComplaintController::class, 'updateStatus']);
-    Route::post('/complaints/{id}/notes', [ComplaintController::class, 'addNote']);
 
     Route::get('/complaints/{id}/timeline', [ComplaintController::class, 'timeline']);
 
-    Route::put('/complaints/{id}/archive', [ComplaintController::class, 'archive']);
+
+
+    // Dashboard
+    Route::get('/dashboard', [ReportController::class, 'dashboard']);
+
+    // Logs
+    Route::get('/logs', [ReportController::class, 'logs']);
+    Route::get('/error-logs', [ReportController::class, 'errorLogs']);
+
+    // Export
+    Route::get('/export/csv', [ReportController::class, 'exportCSV']);
+    Route::get('/export/pdf', [ReportController::class, 'exportPDF']);
 });
 
