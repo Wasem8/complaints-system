@@ -10,9 +10,7 @@ use Illuminate\Support\Collection;
 
 class ComplaintStatusRepository implements ComplaintStatusRepositoryInterface
 {
-    /**
-     * إنشاء سجل جديد لسجل التحديثات على الشكوى
-     */
+
     public function createForComplaint(
         Complaint $complaint,
         string $newStatus,

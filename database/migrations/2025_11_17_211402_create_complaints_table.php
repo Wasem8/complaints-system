@@ -23,11 +23,10 @@ return new class extends Migration
                 'technical_issue'
             ]);
             $table->foreignId('department_id')->constrained('departments')->cascadeOnDelete();
-
             $table->text('description');
             $table->string('location_text')->nullable();
-
             $table->enum('status', ['pending', 'processing', 'done', 'rejected'])->default('pending');
+            $table->foreignId('handled_by')->nullable()->constrained('users')->nullOnDelete();
             $table->string('tracking_number')->unique();
             $table->timestamps();
         });

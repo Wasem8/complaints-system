@@ -38,23 +38,12 @@ class AdminComplaintRepository implements AdminComplaintRepositoryInterface
         return $complaint;
     }
 
-    public function addNote(Complaint $complaint, array $data): Complaint
-    {
-        $complaint->notes()->create($data);
-        return $complaint->load('notes');
-    }
 
     public function getTimeline(Complaint $complaint)
     {
         return [
             'status_logs' => $complaint->statusLogs()->latest()->get(),
-            'notes'       => $complaint->notes()->latest()->get(),
         ];
     }
 
-    public function archive(Complaint $complaint): bool
-    {
-        $complaint->status = 'archived';
-        return $complaint->save();
-    }
 }
