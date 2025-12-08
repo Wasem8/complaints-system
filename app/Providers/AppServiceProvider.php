@@ -2,9 +2,12 @@
 
 namespace App\Providers;
 
+use App\Models\AuditLog;
+use App\Repositories\Contracts\AuditLogRepositoryInterface;
 use App\Repositories\Contracts\ComplaintRepositoryInterface;
 use App\Repositories\Contracts\ComplaintTypeRepositoryInterface;
 use App\Repositories\Contracts\PermissionRepositoryInterface;
+use App\Repositories\Eloquent\AuditLogRepository;
 use App\Repositories\Eloquent\ComplaintRepository;
 use App\Repositories\Eloquent\ComplaintTypeRepository;
 use App\Repositories\Eloquent\PermissionRepository;
@@ -51,6 +54,10 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(
             ComplaintTypeRepositoryInterface::class,
             ComplaintTypeRepository::class
+        );
+        $this->app->bind(
+            \App\Repositories\Contracts\AuditLogRepositoryInterface::class,
+            \App\Repositories\Eloquent\AuditLogRepository::class
         );
     }
 

@@ -7,10 +7,14 @@ use App\Repositories\Contracts\DepartmentRepositoryInterface;
 class DepartmentService
 {
     protected DepartmentRepositoryInterface $departments;
+    protected AuditService $audit;
 
-    public function __construct(DepartmentRepositoryInterface $departments)
+    public function __construct(DepartmentRepositoryInterface $departments,
+        AuditService $audit
+    )
     {
         $this->departments = $departments;
+        $this->audit = $audit;
     }
 
     public function getAll()
@@ -20,7 +24,16 @@ class DepartmentService
 
     public function create(array $data)
     {
-        return $this->departments->create($data);
+        $department = $this->departments->create($data);
+
+        $this->audit->log(
+            module: 'departments',
+            action: 'create',
+            description: 'تم إنشاء قسم جديد',
+            old: null,
+            new: $department->toArray()
+        );
+        return $department;
     }
 
     public function update(int $id, array $data)
@@ -31,7 +44,19 @@ class DepartmentService
             return null;
         }
 
-        return $this->departments->update($department, $data);
+        $oldData = $department->toArray();
+
+        $updated = $this->departments->update($department, $data);
+
+        $this->audit->log(
+            module: 'departments',
+            action: 'update',
+            description: 'تم تحديث بيانات القسم',
+            old: $oldData,
+            new: $updated->toArray()
+        );
+
+        return $updated;
     }
 
     public function delete(int $id)
@@ -42,6 +67,18 @@ class DepartmentService
             return null;
         }
 
-        return $this->departments->delete($department);
+        $oldData = $department->toArray();
+
+        $this->departments->delete($department);
+
+        $this->audit->log(
+            module: 'departments',
+            action: 'delete',
+            description: 'تم حذف القسم',
+            old: $oldData,
+            new: null
+        );
+
+        return true;
     }
 }

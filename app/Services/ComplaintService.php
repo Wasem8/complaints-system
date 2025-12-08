@@ -14,9 +14,12 @@ use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Str;
+use App\Traits\Auditable;
 
 class ComplaintService
 {
+
+    use Auditable;
     public function __construct(
         private ComplaintRepositoryInterface $repo,
         private ComplaintStatusRepositoryInterface $statusRepo,
@@ -37,6 +40,15 @@ class ComplaintService
         if (!empty($files)) {
             $this->repo->addFiles($complaint, $files);
         }
+
+        $this->audit(
+            module: 'complaints',
+            action: 'create',
+            description: 'تم إنشاء الشكوى',
+            old: null,
+            new: $complaint->toArray()
+        );
+
         return [
             'status' => true,
             'message' => 'Complaint submitted successfully',
@@ -74,6 +86,14 @@ class ComplaintService
                 $oldStatus,
             );
 
+            $this->audit(
+                'complaints',
+                'update_status',
+                'تم تحديث حالة الشكوى',
+                ['old_status' => $oldStatus],
+                ['new_status' => $newStatus]
+            );
+
             if ($complaint->user) {
                 $complaint->user->notify(new ComplaintStatusUpdated($complaint, $newStatus));
             }
@@ -86,6 +106,14 @@ class ComplaintService
             $complaint,
             $complaint->status,
             $note
+        );
+
+        $this->audit(
+            'complaints',
+            'add_note',
+            'تمت إضافة ملاحظة للشكوى',
+            null,
+            ['note' => $note]
         );
 
         if($complaint->user) {
@@ -105,8 +133,16 @@ class ComplaintService
             $complaint,
             $complaint->status,
             $message
-
         );
+
+        $this->audit(
+            'complaints',
+            'request_more_info',
+            'تم طلب معلومات إضافية',
+            null,
+            ['message' => $message]
+        );
+
         if ($complaint->user) {
             $complaint->user->notify(
                 new ComplaintMoreInfoRequested($complaint, $message)
@@ -125,6 +161,4 @@ class ComplaintService
         }
         return $this->repo->getuserComplaints($citizenId);
     }
-
-
 }

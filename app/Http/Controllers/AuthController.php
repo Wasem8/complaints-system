@@ -14,12 +14,15 @@ use Illuminate\Support\Facades\RateLimiter;
 class AuthController extends Controller
 {
     private AuthService $authService;
+    
 
-    public function __construct(AuthService $authService){
+    public function __construct(AuthService $authService)
+    {
         $this->authService = $authService;
     }
 
-    public function register(RegisterRequest $request){
+    public function register(RegisterRequest $request)
+    {
         $data = [];
         try {
             $validatedData = $request->validated();
@@ -28,11 +31,10 @@ class AuthController extends Controller
                 'user'   => $data['user'],
                 'tokens' => $data['tokens'] ?? null,
             ], $data['message'], $data['code']);
-        }catch (\Throwable $exception) {
+        } catch (\Throwable $exception) {
             $message = $exception->getMessage();
             return Response::Error($data, $message);
         }
-
     }
 
 
@@ -57,19 +59,18 @@ class AuthController extends Controller
 
         $data = [];
         try {
-            $key = 'login:'.$request->ip().':'.$request->email;
-            if(RateLimiter::tooManyAttempts($key, (int)config('auth.rate_limit_login', 5))) {
+            $key = 'login:' . $request->ip() . ':' . $request->email;
+            if (RateLimiter::tooManyAttempts($key, (int)config('auth.rate_limit_login', 5))) {
                 $seconds = RateLimiter::availableIn($key);
                 return Response::Error([], "Too many attempts. Try again in $seconds seconds.", 429);
             }
-        $validatedData = $request->validated();
-        $data = $this->authService->login($validatedData,$role);
-        RateLimiter::hit($key, 60);
-        return Response::Success([
-            'user'   => $data['user'],
-            'tokens' => $data['tokens'] ?? null,
-        ], $data['message'], $data['code']);
-
+            $validatedData = $request->validated();
+            $data = $this->authService->login($validatedData, $role);
+            RateLimiter::hit($key, 60);
+            return Response::Success([
+                'user'   => $data['user'],
+                'tokens' => $data['tokens'] ?? null,
+            ], $data['message'], $data['code']);
         } catch (\Throwable $exception) {
             $message = $exception->getMessage();
             return Response::Error($data, $message);
@@ -90,7 +91,7 @@ class AuthController extends Controller
 
             return Response::Success(true, $data['message'], $data['code']);
         } catch (\Throwable $exception) {
-            return Response::Error([], 'Failed to logout: '.$exception->getMessage(), 500);
+            return Response::Error([], 'Failed to logout: ' . $exception->getMessage(), 500);
         }
     }
 
@@ -111,8 +112,6 @@ class AuthController extends Controller
     public function sendEmailVerification(Request $request)
     {
         $request->user()->notify(new EmailVerificationNotification());
-        return Response::Success(true,'success',200);
-
+        return Response::Success(true, 'success', 200);
     }
-
 }
