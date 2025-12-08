@@ -14,11 +14,10 @@ class UserManagementService
         $this->repo = $repo;
     }
 
-    public function list()
+    public function filterUsers(array $filters)
     {
-        return $this->repo->all();
+        return $this->repo->all($filters);
     }
-
     public function find($id)
     {
         return $this->repo->find($id);

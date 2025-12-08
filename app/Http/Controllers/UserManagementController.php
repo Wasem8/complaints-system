@@ -18,12 +18,13 @@ class UserManagementController extends Controller
 
     }
 
-
-    public function index()
+    public function index(Request $request)
     {
-        $users = $this->service->list();
-        return Response::Success($users,'users list',200);
+        $filters = $request->only(['role', 'status', 'department_id']);
+        $users = $this->service->filterUsers($filters);
+        return Response::success($users, 'Filtered users list');
     }
+
 
 
     public function show($id)
