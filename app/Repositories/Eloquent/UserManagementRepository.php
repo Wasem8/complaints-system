@@ -7,9 +7,23 @@ use App\Repositories\Contracts\UserManagementRepositoryInterface;
 
 class UserManagementRepository implements UserManagementRepositoryInterface
 {
-    public function all()
+    public function all(array $filters)
     {
-        return User::all();
+        $query = User::query()->with('department');
+
+        if (isset($filters['role'])) {
+            $query->role($filters['role']);
+        }
+
+        if (isset($filters['status'])) {
+            $query->where('status', $filters['status']);
+        }
+
+        if (isset($filters['department_id'])) {
+            $query->where('department_id', $filters['department_id']);
+        }
+
+        return $query->get();
     }
 
     public function find(int $id): ?User

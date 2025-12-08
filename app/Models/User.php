@@ -28,7 +28,8 @@ class User extends Authenticatable implements JWTSubject
         'email',
         'password',
         'email_verified_at',
-        'department_id'
+        'department_id',
+        'status'
     ];
 
     /**
@@ -78,6 +79,9 @@ class User extends Authenticatable implements JWTSubject
         return $this->belongsTo(Department::class);
     }
 
-
+    public function handledComplaints()
+    {
+        return $this->hasMany(Complaint::class, 'handled_by');
+    }
 
 }
