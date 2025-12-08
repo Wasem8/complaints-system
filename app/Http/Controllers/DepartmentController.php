@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreDepartmentRequest;
+use App\Http\Requests\UpdateDepartmentRequest;
 use App\Http\Responses\Response;
 use App\Services\DepartmentService;
 use Illuminate\Http\Request;
@@ -28,12 +29,13 @@ class DepartmentController extends Controller
 
         $data = $this->service->create($validatedData);
 
-        return Response::Success($data,'store department success', 200);
+        return Response::Success($data,'store department success', 201);
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateDepartmentRequest $request, $id)
     {
-        $updated = $this->service->update($id, $request->only(['name','description']));
+        $validatedData = $request->validated();
+        $updated = $this->service->update($id, $validatedData);
 
         if (!$updated)
             return Response::Error(null,'Department not found',404);
@@ -49,7 +51,7 @@ class DepartmentController extends Controller
         if (!$deleted)
             return Response::Error(null,'Department not found',404);
 
-        return Response::Success($deleted,'delete department success', 200);
+        return Response::Success($deleted,'delete department success', 204);
     }
 }
 

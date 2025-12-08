@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\AuditController;
 use App\Http\Controllers\AuthController;
 
 use App\Http\Controllers\DepartmentController;
@@ -13,8 +12,6 @@ use Illuminate\Support\Facades\Route;
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
-
-
 
 Route::prefix('admin')->group(function (){
     Route::post('/login',[AuthController::class,'loginAdmin']);
@@ -37,6 +34,8 @@ Route::prefix('admin')->middleware(['auth:api', 'role:admin'])->group(function (
     Route::post('/users', [UserManagementController::class, 'store']);
     Route::put('/users/{id}', [UserManagementController::class, 'update']);
     Route::delete('/users/{id}', [UserManagementController::class, 'destroy']);
+    Route::patch('/users/{id}/status', [UserManagementController::class, 'updateStatus']);
+
 
     Route::get('/roles', [PermissionController::class, 'roles']);
     Route::get('/permissions', [PermissionController::class, 'permissions']);
@@ -45,13 +44,5 @@ Route::prefix('admin')->middleware(['auth:api', 'role:admin'])->group(function (
     Route::post('/permissions', [PermissionController::class, 'createPermission']);
 
     Route::post('/roles/{role}/assign', [PermissionController::class, 'assignPermissions']);
-
-    Route::prefix('audit-logs')->group(function () {
-        Route::get('/',[AuditController::class,'index']);
-        Route::get('/filter',[AuditController::class,'filter']);
-        Route::get('/{id}', [AuditController::class, 'show']);
-    });
-
-
 });
 

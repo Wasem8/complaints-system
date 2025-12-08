@@ -18,12 +18,13 @@ class UserManagementController extends Controller
 
     }
 
-
-    public function index()
+    public function index(Request $request)
     {
-        $users = $this->service->list();
-        return Response::Success($users,'users list',200);
+        $filters = $request->only(['role', 'status', 'department_id']);
+        $users = $this->service->filterUsers($filters);
+        return Response::success($users, 'Filtered users list');
     }
+
 
 
     public function show($id)
@@ -70,4 +71,20 @@ class UserManagementController extends Controller
         return Response::Success(null,'User has been deleted',200);
 
     }
+
+    public function updateStatus(Request $request, $id)
+    {
+        $request->validate([
+            'status' => 'required|in:active,inactive'
+        ]);
+
+        $user = $this->service->updateStatus($id, $request->status);
+
+        if (!$user) {
+            return Response::error(null, 'User not found', 404);
+        }
+
+        return Response::success($user, "Status updated");
+    }
+
 }

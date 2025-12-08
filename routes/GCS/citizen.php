@@ -17,7 +17,7 @@ Route::prefix('citizen')->group(function (){
 });
 
 
-Route::prefix('citizen')->middleware(['auth:api', 'role:citizen'])->group(function () {
+Route::prefix('citizen')->middleware(['auth:api', 'role:citizen','check.status'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/email-verification',[AuthController::class,'emailVerification']);
     Route::get('/email-verification',[AuthController::class,'sendEmailVerification']);

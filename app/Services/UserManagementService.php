@@ -16,11 +16,10 @@ class UserManagementService
         $this->audit = $audit;
     }
 
-    public function list()
+    public function filterUsers(array $filters)
     {
-        return $this->repo->all();
+        return $this->repo->all($filters);
     }
-
     public function find($id)
     {
         return $this->repo->find($id);
@@ -28,10 +27,13 @@ class UserManagementService
 
     public function create(array $data)
     {
+        if (($data['role'] ?? null) !== 'employee') {
+            $data['department_id'] = null;
+        }
         $data['password'] = Hash::make($data['password']);
-
+        $data['email_verified_at'] = now();
+        $data['status'] = 'active';
         $user = $this->repo->create($data);
-
         if (isset($data['role'])) {
             $user->assignRole($data['role']);
         }
@@ -87,4 +89,16 @@ class UserManagementService
 
         return $this->repo->delete($user);
     }
+
+    public function updateStatus($id, string $status)
+    {
+        $user = $this->repo->find($id);
+        if (!$user) return null;
+
+        $user->status = $status;
+        $user->save();
+
+        return $user;
+    }
+
 }

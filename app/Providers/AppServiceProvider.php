@@ -2,15 +2,25 @@
 
 namespace App\Providers;
 
+<<<<<<< HEAD
 use App\Models\AuditLog;
 use App\Repositories\Contracts\AuditLogRepositoryInterface;
+=======
+use App\Repositories\Contracts\AdminComplaintRepositoryInterface;
+>>>>>>> 5e366279ca3fcfe76fdde93c88a4e2434bdcfbfd
 use App\Repositories\Contracts\ComplaintRepositoryInterface;
-use App\Repositories\Contracts\ComplaintTypeRepositoryInterface;
+use App\Repositories\Contracts\ComplaintStatusRepositoryInterface;
 use App\Repositories\Contracts\PermissionRepositoryInterface;
+<<<<<<< HEAD
 use App\Repositories\Eloquent\AuditLogRepository;
+=======
+use App\Repositories\Contracts\ReportRepositoryInterface;
+use App\Repositories\Eloquent\AdminComplaintRepository;
+>>>>>>> 5e366279ca3fcfe76fdde93c88a4e2434bdcfbfd
 use App\Repositories\Eloquent\ComplaintRepository;
-use App\Repositories\Eloquent\ComplaintTypeRepository;
+use App\Repositories\Eloquent\ComplaintStatusRepository;
 use App\Repositories\Eloquent\PermissionRepository;
+use App\Repositories\Eloquent\ReportRepository;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -41,10 +51,6 @@ class AppServiceProvider extends ServiceProvider
             \App\Repositories\Contracts\UserManagementRepositoryInterface::class,
             \App\Repositories\Eloquent\UserManagementRepository::class
         );
-        $this->app->bind(
-            \App\Repositories\Contracts\ComplaintStatusRepositoryInterface::class,
-            \App\Repositories\Eloquent\ComplaintStatusRepository::class,
-        );
 
         $this->app->bind(
             PermissionRepositoryInterface::class,
@@ -52,13 +58,27 @@ class AppServiceProvider extends ServiceProvider
         );
 
         $this->app->bind(
-            ComplaintTypeRepositoryInterface::class,
-            ComplaintTypeRepository::class
+            AdminComplaintRepositoryInterface::class,
+            AdminComplaintRepository::class
         );
+<<<<<<< HEAD
         $this->app->bind(
             \App\Repositories\Contracts\AuditLogRepositoryInterface::class,
             \App\Repositories\Eloquent\AuditLogRepository::class
         );
+=======
+
+        $this->app->bind(
+            ReportRepositoryInterface::class,
+            ReportRepository::class
+        );
+
+        $this->app->bind(
+            ComplaintStatusRepositoryInterface::class,
+            ComplaintStatusRepository::class
+        );
+
+>>>>>>> 5e366279ca3fcfe76fdde93c88a4e2434bdcfbfd
     }
 
     /**
