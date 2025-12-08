@@ -9,7 +9,7 @@ class UserManagementRepository implements UserManagementRepositoryInterface
 {
     public function all()
     {
-        return User::all();
+        return User::with('department')->get();
     }
 
     public function find(int $id): ?User

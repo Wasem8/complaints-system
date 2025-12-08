@@ -70,4 +70,20 @@ class UserManagementController extends Controller
         return Response::Success(null,'User has been deleted',200);
 
     }
+
+    public function updateStatus(Request $request, $id)
+    {
+        $request->validate([
+            'status' => 'required|in:active,inactive'
+        ]);
+
+        $user = $this->service->updateStatus($id, $request->status);
+
+        if (!$user) {
+            return Response::error(null, 'User not found', 404);
+        }
+
+        return Response::success($user, "Status updated");
+    }
+
 }

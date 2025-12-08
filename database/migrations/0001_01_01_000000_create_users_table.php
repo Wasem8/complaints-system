@@ -18,6 +18,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->foreignId('department_id')->nullable()->constrained()->nullOnDelete();
+            $table->enum('status', ['active', 'inactive'])->default('active');
             $table->integer('failed_attempts')->default(0);
             $table->timestamp('locked_until')->nullable();
             $table->rememberToken();

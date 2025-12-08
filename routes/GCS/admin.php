@@ -41,6 +41,8 @@ Route::prefix('admin')->middleware(['auth:api', 'role:admin'])->group(function (
     Route::post('/users', [UserManagementController::class, 'store']);
     Route::put('/users/{id}', [UserManagementController::class, 'update']);
     Route::delete('/users/{id}', [UserManagementController::class, 'destroy']);
+    Route::patch('/users/{id}/status', [UserManagementController::class, 'updateStatus']);
+
 
     Route::get('/roles', [PermissionController::class, 'roles']);
     Route::get('/permissions', [PermissionController::class, 'permissions']);

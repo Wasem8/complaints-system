@@ -26,7 +26,7 @@ class StoreUserRequest extends FormRequest
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:6',
             'role' => 'required|string|in:admin,employee,citizen',
-            'department_id' => 'nullable|exists:departments,id',
+            'department_id' => 'required_if:role,employee|nullable|exists:departments,id',
         ];
     }
 }
