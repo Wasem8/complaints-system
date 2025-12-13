@@ -12,4 +12,5 @@ interface UserManagementRepositoryInterface
     public function update(User $user, array $data): User;
     public function delete(User $user): bool;
     public function getByRole(string $role);
+    public function searchUser(string $query);
 }

@@ -87,4 +87,18 @@ class UserManagementController extends Controller
         return Response::success($user, "Status updated");
     }
 
+    public function searchUser(Request $request)
+    {
+        $request->validate([
+            'query' => 'required|string|max:255',
+        ]);
+
+        $query = $request->input('query');
+
+        $users = $this->service->searchUser($query);
+
+        return Response::success($users, "Users matching '{$query}'");
+    }
+
+
 }

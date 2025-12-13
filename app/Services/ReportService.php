@@ -71,7 +71,7 @@ class ReportService
         file_put_contents($fullPath, $pdf->output());
 
         if ($forDownload) {
-            return $fullPath; 
+            return $fullPath;
         }
 
         return asset('storage/' . $filename);

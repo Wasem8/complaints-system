@@ -52,7 +52,7 @@ class BackupDatabase extends Command
         $now = time();
 
         foreach ($files as $file) {
-            if ($now - filemtime($file) > ($days * 86400)) { // 86400 = ثانية في اليوم
+            if ($now - filemtime($file) > ($days * 86400)) { 
                 unlink($file);
             }
         }

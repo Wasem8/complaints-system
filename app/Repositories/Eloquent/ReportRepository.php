@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Eloquent;
 
+use App\Models\AuditLog;
 use App\Models\Complaint;
 use App\Models\User;
 use App\Models\ActivityLog;
@@ -46,7 +47,7 @@ class ReportRepository implements ReportRepositoryInterface
 
     public function activityLogs(array $filters)
     {
-        return ActivityLog::latest()->paginate(30);
+        return AuditLog::latest()->paginate(30);
     }
 
     public function errorLogs(array $filters)

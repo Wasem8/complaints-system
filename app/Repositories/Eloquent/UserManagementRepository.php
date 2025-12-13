@@ -51,4 +51,12 @@ class UserManagementRepository implements UserManagementRepositoryInterface
     {
         return User::role($role)->get();
     }
+
+    public function searchUser(string $query)
+    {
+        return User::where('name', 'like', "%{$query}%")
+            ->orWhere('email', 'like', "%{$query}%")
+            ->get();
+    }
+
 }

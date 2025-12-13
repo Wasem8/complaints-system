@@ -35,7 +35,7 @@
     <thead>
     <tr>
         <th>ID</th>
-        <th>Title</th>
+        <th>Type</th>
         <th>Status</th>
         <th>Department</th>
         <th>Created At</th>
@@ -45,7 +45,7 @@
     @foreach($items as $complaint)
         <tr>
             <td>{{ $complaint->id }}</td>
-            <td>{{ $complaint->title }}</td>
+            <td>{{ $complaint->type }}</td>
             <td>{{ ucfirst($complaint->status) }}</td>
             <td>{{ $complaint->department->name ?? '-' }}</td>
             <td>{{ $complaint->created_at }}</td>

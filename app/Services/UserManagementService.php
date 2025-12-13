@@ -102,4 +102,10 @@ class UserManagementService
         return $user;
     }
 
+    public function searchUser(string $query)
+    {
+        return $this->repo->searchUser($query);
+    }
+
+
 }
