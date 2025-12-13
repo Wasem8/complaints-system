@@ -32,6 +32,9 @@ class User extends Authenticatable implements JWTSubject
         'status'
     ];
 
+
+    protected $appends = ['role'];
+
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -74,6 +77,11 @@ class User extends Authenticatable implements JWTSubject
         ];
     }
 
+    public function getRoleAttribute()
+    {
+        return $this->roles()->pluck('name')->first();
+    }
+
     public function department(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Department::class);
@@ -83,5 +91,7 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(Complaint::class, 'handled_by');
     }
+
+
 
 }

@@ -44,6 +44,7 @@ class UserManagementService
             old: null,
             new: $user->toArray()
         );
+
         return $user;
     }
 

@@ -10,7 +10,7 @@ class PermissionRepository implements PermissionRepositoryInterface
 {
     public function allRoles()
     {
-        return Role::all();
+        return Role::with('permissions')->get();
     }
 
     public function allPermissions()

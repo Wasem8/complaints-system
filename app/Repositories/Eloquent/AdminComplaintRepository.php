@@ -33,8 +33,13 @@ class AdminComplaintRepository implements AdminComplaintRepositoryInterface
 
     public function updateStatus(Complaint $complaint, string $status): Complaint
     {
+        $oldStatus = $complaint->status;
         $complaint->status = $status;
         $complaint->save();
+        $complaint->statusLogs()->create([
+            'old_status' => $oldStatus,
+            'new_status' => $status,
+        ]);
         return $complaint;
     }
 
