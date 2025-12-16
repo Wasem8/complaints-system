@@ -50,7 +50,7 @@ class ComplaintController extends Controller
     }
 
     public function getComplaintById(int $id) {
-        
+
         $data = $this->service->find($id);
         if (!$data) return Response::error(null, "Complaint not found", 404);
 
@@ -104,35 +104,25 @@ class ComplaintController extends Controller
             ], 422);
         }
     }
-    public function addNote(Request $request, int $id)
+    public function addMessageToComplaint(Request $request, int $id)
     {
         $request->validate([
-            'note' => 'required|string'
+            'message' => 'required|string',
+            'type' => 'required|in:note,more_info',
         ]);
 
-       $data =  $this->service->addNote($id, $request->note);
+        $data = $this->service->addMessage(
+            $id,
+            $request->message,
+            $request->type
+        );
 
-        return Response::Success([
-            'data'=> $data,
-            'message' => 'تم اضافة ملاحضة بنجاح',
-            'code' => 1,
-        ],200);
-    }
-    public function requestMoreInfo(Request $request, int $complaintId)
-    {
-        $request->validate([
-            'message' => 'required|string|max:5000',
-        ]);
-        try {
-            $data = $this->service->requestMoreInfo(
-                $complaintId,
-                $request->message
-            );
-
-            return Response::Success($data,'you need more info to complaint',200);
-        } catch (\Exception $e) {
-            return Response::Error(null, $e->getMessage(),400);
-        }
+        return Response::success(
+            $data,
+            $request->type === 'note'
+                ? 'تمت إضافة الملاحظة بنجاح'
+                : 'تم إرسال طلب المعلومات بنجاح'
+        );
     }
     public function getAllcomplaint() {
 

@@ -65,7 +65,6 @@ class ComplaintService
         return $this->repo->getByDepartment($departmentId);
     }
 
-
     public function updateStatus(int $complaintId, string $newStatus, ?string $note = null)
     {
         Cache::lock('complaint_lock_' . $complaintId, 10)->block(5, function () use ($complaintId, $newStatus, $note) {
@@ -113,55 +112,45 @@ class ComplaintService
         });
     }
 
-    public function addNote(int $complaintId, string $note) {
-        $complaint = $this->repo->find($complaintId);
-        $log = $this->statusRepo->createForComplaint(
-            $complaint,
-            $complaint->status,
-            $note
-        );
-
-        $this->audit(
-            'complaints',
-            'add_note',
-            'تمت إضافة ملاحظة للشكوى',
-            null,
-            ['note' => $note]
-        );
-
-        if($complaint->user) {
-            $complaint->user->notify(
-                new ComplaintNoteAdded($complaint,$note)
-            );
-        }
-
-        return $log;
-
-    }
-
-    public function requestMoreInfo(int $complaintId, string $message)
+    public function addMessage(int $complaintId, string $message, string $type = 'note'): array
     {
         $complaint = $this->repo->find($complaintId);
-        $this->statusRepo->createForComplaint(
+        if (!$complaint) {
+            throw new \Exception('الشكوى غير موجودة');
+        }
+
+        // Create status log
+        $log = $this->statusRepo->createForComplaint(
             $complaint,
             $complaint->status,
             $message
         );
 
+        // Audit
         $this->audit(
             'complaints',
-            'request_more_info',
-            'تم طلب معلومات إضافية',
+            $type === 'note' ? 'add_note' : 'request_more_info',
+            $type !== 'note' ? 'تمت إضافة ملاحظة للشكوى' : 'تم طلب معلومات إضافية',
             null,
             ['message' => $message]
         );
 
+        // Notify user
         if ($complaint->user) {
-            $complaint->user->notify(
-                new ComplaintMoreInfoRequested($complaint, $message)
-            );
+            if ($type === 'note') {
+                $complaint->user->notify(new ComplaintNoteAdded($complaint, $message));
+            } else {
+                $complaint->user->notify(new ComplaintMoreInfoRequested($complaint, $message));
+            }
         }
-        return true;
+
+        return [
+            'complaint_id' => $complaint->id,
+            'type' => $type,
+            'message' => $message,
+            'log_id' => $log->id,
+            'status' => $complaint->status
+        ];
     }
 
     public function getComplaintsForCitizen(): Collection
