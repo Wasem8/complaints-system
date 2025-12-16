@@ -15,23 +15,20 @@ class ComplaintStatusService
     )
     {}
 
-    public function getStatusTimeLine(int $complaintId): array {
-        $complaint = $this->complaintRepo->find($complaintId);
-
+    public function getStatusTimeLine(int $complaintId): array
+    {
         $logs = $this->statusRepo->getByComplaintId($complaintId);
-        return [
-            'id'             => $complaint->id,
-            'new_status' => $complaint->status,
-            'history'        => $logs->map(function ($log) {
-                return [
-                    'status' => $log->new_status,
-                    'time'   => $log->created_at->toDateTimeString(),
-                    'note'   => $log->note,
-                ];
-            }),
-            'last_update' => $logs->last()?->new_status
-        ];
-    }
 
+        return $logs->map(function ($log) {
+            return [
+                'id'           => $log->id,
+                'complaint_id' => $log->complaint_id,
+                'new_status'   => $log->new_status,
+                'note'         => $log->note,
+                'created_at'   => $log->created_at->toDateTimeString(),
+                'updated_at'   => $log->updated_at->toDateTimeString(),
+            ];
+        })->toArray();
+    }
 }
 
