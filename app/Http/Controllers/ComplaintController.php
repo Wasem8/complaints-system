@@ -49,8 +49,8 @@ class ComplaintController extends Controller
         ]);
     }
 
-    public function getComplaintById(int $id) {
-
+    public function getComplaintById(int $id)
+    {
         $data = $this->service->find($id);
         if (!$data) return Response::error(null, "Complaint not found", 404);
 

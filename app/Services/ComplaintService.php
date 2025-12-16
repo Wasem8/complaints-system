@@ -174,9 +174,9 @@ class ComplaintService
         $departmentId = $employee->department_id;
 
         return $this->repo->query()
+            ->with('user') // تضمين بيانات المستخدم
             ->where('id', $id)
             ->where('department_id', $departmentId)
             ->first();
-        }
-
+    }
 }
