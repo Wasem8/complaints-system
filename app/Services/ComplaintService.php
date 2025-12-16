@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Complaint;
 use App\Models\Complaint_status_log;
 use App\Notifications\ComplaintMoreInfoRequested;
 use App\Notifications\ComplaintNoteAdded;
@@ -74,7 +75,19 @@ class ComplaintService
                 throw new \Exception("الشكوى غير موجودة");
             }
 
+
             $oldStatus = $complaint->status;
+
+            if($oldStatus === $newStatus) {
+                throw new \Exception('الحالة نفسها، لا يوجد تغيير');
+            }
+
+            $finalStatuses = ['done', 'rejected'];
+
+            if (in_array($oldStatus, $finalStatuses, true)) {
+                throw new \Exception('انتهت معالجة الشكوى');
+            }
+
 
             $this->repo->update($complaint->id, ['status' => $newStatus]);
 
@@ -161,4 +174,16 @@ class ComplaintService
         }
         return $this->repo->getuserComplaints($citizenId);
     }
+
+    public function find(int $id)
+    {
+        $employee = auth()->user();
+        $departmentId = $employee->department_id;
+
+        return $this->repo->query()
+            ->where('id', $id)
+            ->where('department_id', $departmentId)
+            ->first();
+        }
+
 }

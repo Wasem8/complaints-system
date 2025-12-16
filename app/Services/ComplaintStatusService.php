@@ -31,7 +31,6 @@ class ComplaintStatusService
             }),
             'last_update' => $logs->last()?->new_status
         ];
-
     }
 
 }

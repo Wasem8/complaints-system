@@ -96,3 +96,4 @@ Route::prefix('admin')->middleware(['auth:api', 'role:admin'])->group(function (
     Route::get('/export/pdf', [ReportController::class, 'exportPDF']);
 });
 
+

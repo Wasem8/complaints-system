@@ -49,6 +49,13 @@ class ComplaintController extends Controller
         ]);
     }
 
+    public function getComplaintById(int $id) {
+        
+        $data = $this->service->find($id);
+        if (!$data) return Response::error(null, "Complaint not found", 404);
+
+        return Response::success($data, 'success');
+    }
     public function show(int $id) {
         try {
             $data = $this->statusService->getStatusTimeLine($id);
@@ -70,16 +77,32 @@ class ComplaintController extends Controller
     {
 
 
-        $this->service->updateStatus(
-            $id,
-            $request->status,
-            $request->note
-        );
+        try {
+            $this->service->updateStatus(
+                $id,
+                $request->status,
+                $request->note
+            );
 
-        return response()->json([
-            'success' => true,
-            'message' => 'تم تحديث حالة الشكوى بنجاح'
-        ]);
+            return response()->json([
+                'success' => true,
+                'message' => 'تم تحديث حالة الشكوى بنجاح',
+                'updated_by' => [
+                    'id'   => auth()->id(),
+                    'name' => auth()->user()->name,
+                ]
+            ]);
+        } catch (\Throwable $e) {
+
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+                'updated_by' => [
+                    'id'   => auth()->id(),
+                    'name' => auth()->user()->name,
+                ]
+            ], 422);
+        }
     }
     public function addNote(Request $request, int $id)
     {
@@ -95,14 +118,13 @@ class ComplaintController extends Controller
             'code' => 1,
         ],200);
     }
-
     public function requestMoreInfo(Request $request, int $complaintId)
     {
         $request->validate([
             'message' => 'required|string|max:5000',
         ]);
         try {
-          $data = $this->service->requestMoreInfo(
+            $data = $this->service->requestMoreInfo(
                 $complaintId,
                 $request->message
             );
@@ -112,11 +134,10 @@ class ComplaintController extends Controller
             return Response::Error(null, $e->getMessage(),400);
         }
     }
-
     public function getAllcomplaint() {
 
         $complaints = $this->service->getComplaintsForCitizen();
-        
+
         return Response::Success($complaints,'complaints get successfully',200);
     }
 }

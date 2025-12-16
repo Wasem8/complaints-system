@@ -45,6 +45,7 @@ class ComplaintRepository implements ComplaintRepositoryInterface
     {
         return Complaint::with('statusLogs', 'files')->find($id);
     }
+
     public function getByDepartment(int $departmentId): Collection
     {
         return Complaint::with('user','statusLogs','files')
@@ -52,6 +53,7 @@ class ComplaintRepository implements ComplaintRepositoryInterface
         ->orderBy('created_at')
         ->get();
     }
+
     public function update(int $id, array $data): bool
     {
         return Complaint::where('id', $id)->update($data);
@@ -63,5 +65,9 @@ class ComplaintRepository implements ComplaintRepositoryInterface
         ->with('files')
         ->orderBy('created_at')
         ->get();
+    }
+    public function query()
+    {
+        return Complaint::query();
     }
 }

@@ -33,5 +33,7 @@ Route::prefix('employee')->middleware(['auth:api', 'role:employee'])->group(func
         '/complaints/{id}/request-info',
         [ComplaintController::class, 'requestMoreInfo']
     );
+    Route::get('/Complaint-status/{id}', [ComplaintController::class, 'show']);
+    Route::get('complaint/{id}',[ComplaintController::class, 'getComplaintById']);
 });
 
