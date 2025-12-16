@@ -20,11 +20,11 @@ Route::prefix('employee')->middleware(['auth:api', 'role:employee'])->group(func
         '/complaints',
         [ComplaintController::class, 'index']
     );
-    Route::post(
+    Route::put(
         '/complaints/{id}/status',
         [ComplaintController::class, 'updateStatus']
     );
-
+/*
     Route::post(
         '/complaints/{id}/notes',
         [ComplaintController::class, 'addNote']
@@ -33,6 +33,7 @@ Route::prefix('employee')->middleware(['auth:api', 'role:employee'])->group(func
         '/complaints/{id}/request-info',
         [ComplaintController::class, 'requestMoreInfo']
     );
+*/
     Route::get('/Complaint-status/{id}', [ComplaintController::class, 'show']);
     Route::get('complaint/{id}',[ComplaintController::class, 'getComplaintById']);
     Route::post('complaints/{id}/addMessage',[ComplaintController::class, 'addMessageToComplaint']);

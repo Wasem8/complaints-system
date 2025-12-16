@@ -62,8 +62,11 @@ class ComplaintService
     {
         $departmentId = auth()->user()->department_id;
 
-        return $this->repo->getByDepartment($departmentId);
+        return Cache::remember("complaints_department_{$departmentId}", 60, function () use ($departmentId) {
+            return $this->repo->getByDepartment($departmentId);
+        });
     }
+
 
     public function updateStatus(int $complaintId, string $newStatus, ?string $note = null)
     {
@@ -89,6 +92,9 @@ class ComplaintService
 
 
             $this->repo->update($complaint->id, ['status' => $newStatus]);
+
+            Cache::forget("complaints_department_{$complaint->department_id}");
+
 
             $complaint->refresh();
             $this->statusRepo->createForComplaint(
@@ -119,14 +125,12 @@ class ComplaintService
             throw new \Exception('الشكوى غير موجودة');
         }
 
-        // Create status log
         $log = $this->statusRepo->createForComplaint(
             $complaint,
             $complaint->status,
             $message
         );
 
-        // Audit
         $this->audit(
             'complaints',
             $type === 'note' ? 'add_note' : 'request_more_info',
@@ -135,7 +139,8 @@ class ComplaintService
             ['message' => $message]
         );
 
-        // Notify user
+        Cache::forget("complaints_department_{$complaint->department_id}");
+
         if ($complaint->user) {
             if ($type === 'note') {
                 $complaint->user->notify(new ComplaintNoteAdded($complaint, $message));
@@ -152,7 +157,6 @@ class ComplaintService
             'status' => $complaint->status
         ];
     }
-
     public function getComplaintsForCitizen(): Collection
     {
         $citizenId = auth()->id();
