@@ -41,13 +41,6 @@ class ComplaintService
             $this->repo->addFiles($complaint, $files);
         }
 
-        $this->audit(
-            module: 'complaints',
-            action: 'create',
-            description: 'تم إنشاء الشكوى',
-            old: null,
-            new: $complaint->toArray()
-        );
 
         return [
             'status' => true,
@@ -86,13 +79,7 @@ class ComplaintService
                 $oldStatus,
             );
 
-            $this->audit(
-                'complaints',
-                'update_status',
-                'تم تحديث حالة الشكوى',
-                ['old_status' => $oldStatus],
-                ['new_status' => $newStatus]
-            );
+
 
             if ($complaint->user) {
                 $complaint->user->notify(new ComplaintStatusUpdated($complaint, $newStatus));

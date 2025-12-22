@@ -28,7 +28,7 @@ Route::get('/health', function () {
 
 
 Route::prefix('admin')->group(function (){
-    Route::post('/login',[AuthController::class,'loginAdmin']);
+    Route::post('/login',[AuthController::class,'loginAdmin'])->middleware(['throttle:5,1']);;
 });
 
 Route::prefix('admin')->middleware(['auth:api', 'role:admin'])->group(function () {

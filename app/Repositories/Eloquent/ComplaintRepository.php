@@ -43,7 +43,7 @@ class ComplaintRepository implements ComplaintRepositoryInterface
 
     public function find(int $id): ?Complaint
     {
-        return Complaint::with('statusLogs', 'files')->find($id);
+        return Complaint::with('statusLogs', 'files')->findOrFail($id);
     }
     public function getByDepartment(int $departmentId): Collection
     {

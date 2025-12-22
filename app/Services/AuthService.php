@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
+use App\Events\AuditEvent;
 use App\Models\User;
 use App\Notifications\EmailVerificationNotification;
-use App\Repositories\Contracts\AuditLogRepositoryInterface;
 use App\Repositories\Contracts\UserRepositoryInterface;
 use Ichtrojan\Otp\Otp;
 use Illuminate\Support\Facades\Hash;
@@ -14,17 +14,15 @@ class AuthService
 {
     protected TokenService $tokens;
     protected UserRepositoryInterface $users;
-    protected AuditLogRepositoryInterface $audit;
     private Otp $otp;
 
     public function __construct(
         TokenService $tokens,
         UserRepositoryInterface $users,
-        AuditLogRepositoryInterface $audit
     ) {
         $this->users = $users;
         $this->tokens = $tokens;
-        $this->audit = $audit;
+
         $this->otp = new Otp();
     }
 
@@ -46,15 +44,6 @@ class AuthService
         $tokens = $this->tokens->createTokens($user);
         $user->notify(new EmailVerificationNotification());
 
-        $this->audit->log(
-            user_id: $user->id ?? null,
-            module: 'users',
-            action: 'register',
-            description: 'تم إنشاء مستخدم جديد',
-            old: null,
-            new: $user->toArray()
-        );
-
 
         return [
             'user'   => $this->formatUser($user),
@@ -68,14 +57,14 @@ class AuthService
     {
         $user = $this->users->findByEmail($data['email']);
 
-        $this->audit->log(
-            user_id:$user->id ?? null,
-            module: 'users',
-            action: 'login_attempt',
-            description: 'محاولة تسجيل دخول',
-            old: null,
-            new: ['email' => $data['email']]
-        );
+        event(new AuditEvent(
+            $user?->id,
+            'auth',
+            'login_attempt',
+            'محاولة تسجيل دخول فاشلة',
+            null,
+            ['email' => $data['email']]
+        ));
 
         if (!$user) {
             return [
@@ -124,14 +113,14 @@ class AuthService
 
         $tokens = $this->tokens->createTokens($user);
 
-        $this->audit->log(
-            user_id: $user->id ?? null,
-            module: 'users',
-            action: 'login_success',
-            description: 'تم تسجيل الدخول بنجاح',
-            old: null,
-            new: ['user_id' => $user->id]
-        );
+        event(new AuditEvent(
+            $user->id,
+            'auth',
+            'login_success',
+            'تم تسجيل الدخول بنجاح',
+            null,
+            ['user_id' => $user->id]
+        ));
 
         return [
             'user'   => $this->formatUser($user),
@@ -155,14 +144,15 @@ class AuthService
 
         $this->tokens->revokeUserTokens($user);
 
-        $this->audit->log(
-            user_id: $user->id ?? null,
-            module: 'users',
-            action: 'logout',
-            description: 'تم تسجيل الخروج',
-            old: null,
-            new: ['user_id' => $user->id]
-        );
+        event(new AuditEvent(
+            $user->id,
+            'auth',
+            'logout',
+            'تم تسجيل الخروج',
+            null,
+            ['user_id' => $user->id]
+        ));
+
 
         return [
             'success' => true,
@@ -185,16 +175,6 @@ class AuthService
         }
 
         $user->update(['email_verified_at' => now()]);
-
-        $this->audit->log(
-            user_id: $user->id ?? null,
-            module: 'users',
-            action: 'email_verification',
-            description: 'تم التحقق من البريد الإلكتروني',
-            old: null,
-            new: ['user_id' => $user->id, 'email_verified_at' => $user->email_verified_at]
-        );
-
         return ['user' => true, 'message' => 'email verification successfully', 'code' => 200];
     }
 

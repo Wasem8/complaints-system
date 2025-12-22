@@ -92,6 +92,11 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(Complaint::class, 'handled_by');
     }
 
+    public function fcmTokens()
+    {
+        return $this->hasMany(FcmToken::class);
+    }
+
 
 
 }

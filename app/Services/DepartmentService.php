@@ -26,13 +26,6 @@ class DepartmentService
     {
         $department = $this->departments->create($data);
 
-        $this->audit->log(
-            module: 'departments',
-            action: 'create',
-            description: 'تم إنشاء قسم جديد',
-            old: null,
-            new: $department->toArray()
-        );
         return $department;
     }
 
@@ -48,13 +41,6 @@ class DepartmentService
 
         $updated = $this->departments->update($department, $data);
 
-        $this->audit->log(
-            module: 'departments',
-            action: 'update',
-            description: 'تم تحديث بيانات القسم',
-            old: $oldData,
-            new: $updated->toArray()
-        );
 
         return $updated;
     }
@@ -71,13 +57,6 @@ class DepartmentService
 
         $this->departments->delete($department);
 
-        $this->audit->log(
-            module: 'departments',
-            action: 'delete',
-            description: 'تم حذف القسم',
-            old: $oldData,
-            new: null
-        );
 
         return true;
     }

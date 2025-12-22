@@ -4,6 +4,12 @@ namespace App\Providers;
 
 
 use App\Models\AuditLog;
+use App\Models\Complaint;
+use App\Models\Department;
+use App\Models\User;
+use App\Observers\ComplaintObserver;
+use App\Observers\DepartmentObserver;
+use App\Observers\UserObserver;
 use App\Repositories\Contracts\AuditLogRepositoryInterface;
 
 use App\Repositories\Contracts\AdminComplaintRepositoryInterface;
@@ -84,6 +90,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        User::observe(UserObserver::class);
+        Complaint::observe(ComplaintObserver::class);
+        Department::observe(DepartmentObserver::class);
     }
 }
