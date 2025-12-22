@@ -49,74 +49,89 @@ class ComplaintController extends Controller
         ]);
     }
 
-    public function show(int $id) {
-        try {
-            $data = $this->statusService->getStatusTimeLine($id);
+    public function getComplaintById(int $id)
+    {
+        $data = $this->service->find($id);
+        if (!$data) return Response::error(null, "Complaint not found", 404);
 
-            return Response::Success([
-                'status'  => 1,
-                'message' => 'Complaint status',
-                'data'    => $data,
+        return Response::success($data, 'success');
+    }
+    public function show(int $id)
+    {
+        try {
+            $statusLogs = $this->statusService->getStatusTimeLine($id);
+
+            return response()->json([
+                'status' => 1,
+                'message' => 'success',
+                'data' => [
+                    'status_logs' => $statusLogs
+                ]
             ], 200);
         } catch (ModelNotFoundException $e) {
-            return Response::Error([
-                'status'  => 0,
+            return response()->json([
+                'status' => 0,
                 'message' => 'Complaint not found',
-                'data'    => null,
+                'data' => null
             ], 404);
         }
     }
+
     public function updateStatus(UpdateStatusRequest $request, int $id)
     {
 
 
-        $this->service->updateStatus(
-            $id,
-            $request->status,
-            $request->note
-        );
-
-        return response()->json([
-            'success' => true,
-            'message' => 'تم تحديث حالة الشكوى بنجاح'
-        ]);
-    }
-    public function addNote(Request $request, int $id)
-    {
-        $request->validate([
-            'note' => 'required|string'
-        ]);
-
-       $data =  $this->service->addNote($id, $request->note);
-
-        return Response::Success([
-            'data'=> $data,
-            'message' => 'تم اضافة ملاحضة بنجاح',
-            'code' => 1,
-        ],200);
-    }
-
-    public function requestMoreInfo(Request $request, int $complaintId)
-    {
-        $request->validate([
-            'message' => 'required|string|max:5000',
-        ]);
         try {
-          $data = $this->service->requestMoreInfo(
-                $complaintId,
-                $request->message
+            $this->service->updateStatus(
+                $id,
+                $request->status,
+                $request->note
             );
 
-            return Response::Success($data,'you need more info to complaint',200);
-        } catch (\Exception $e) {
-            return Response::Error(null, $e->getMessage(),400);
+            return response()->json([
+                'success' => true,
+                'message' => 'تم تحديث حالة الشكوى بنجاح',
+                'updated_by' => [
+                    'id'   => auth()->id(),
+                    'name' => auth()->user()->name,
+                ]
+            ]);
+        } catch (\Throwable $e) {
+
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+                'updated_by' => [
+                    'id'   => auth()->id(),
+                    'name' => auth()->user()->name,
+                ]
+            ], 422);
         }
     }
+    public function addMessageToComplaint(Request $request, int $id)
+    {
+        $request->validate([
+            'message' => 'required|string',
+            'type' => 'required|in:note,more_info',
+        ]);
 
+        $data = $this->service->addMessage(
+            $id,
+            $request->message,
+            $request->type
+        );
+
+        return Response::success(
+            $data,
+            $request->type === 'note'
+                ? 'تمت إضافة الملاحظة بنجاح'
+                : 'تم إرسال طلب المعلومات بنجاح'
+        );
+    }
     public function getAllcomplaint() {
 
         $complaints = $this->service->getComplaintsForCitizen();
-        
+
         return Response::Success($complaints,'complaints get successfully',200);
     }
 }

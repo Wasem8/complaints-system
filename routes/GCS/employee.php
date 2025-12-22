@@ -16,9 +16,26 @@ Route::prefix('employee')->group(function (){
 
 Route::prefix('employee')->middleware(['auth:api', 'role:employee'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
-    Route::get('/complaints', [ComplaintController::class, 'index']);
-    Route::post('/complaints/{id}/status', [ComplaintController::class, 'updateStatus']);
-
-    Route::post('/complaints/{id}/notes', [ComplaintController::class, 'addNote']);
+    Route::get(
+        '/complaints',
+        [ComplaintController::class, 'index']
+    );
+    Route::put(
+        '/complaints/{id}/status',
+        [ComplaintController::class, 'updateStatus']
+    );
+/*
+    Route::post(
+        '/complaints/{id}/notes',
+        [ComplaintController::class, 'addNote']
+    );
+    Route::post(
+        '/complaints/{id}/request-info',
+        [ComplaintController::class, 'requestMoreInfo']
+    );
+*/
+    Route::get('/complaints/{id}/timeline', [ComplaintController::class, 'show']);
+    Route::get('complaints/{id}',[ComplaintController::class, 'getComplaintById']);
+    Route::post('complaints/{id}/addMessage',[ComplaintController::class, 'addMessageToComplaint']);
 });
 

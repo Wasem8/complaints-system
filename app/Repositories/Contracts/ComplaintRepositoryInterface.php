@@ -14,4 +14,5 @@ interface ComplaintRepositoryInterface
     public function getByDepartment(int $departmentId): Collection;
     public function update(int $id, array $data): bool;
     public function getuserComplaints(int $userId): Collection;
+    public function query();
 }
