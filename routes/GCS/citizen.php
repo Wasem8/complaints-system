@@ -23,6 +23,7 @@ Route::prefix('citizen')->middleware(['auth:api', 'role:citizen','check.status']
 
     Route::get('/email-verification',[AuthController::class,'sendEmailVerification']);
     Route::post('/complaints', [ComplaintController::class, 'store']);
+    Route::post('/complaints/{id}', [ComplaintController::class, 'update']);
     Route::get('/Complaint-status/{id}',[ComplaintController::class,'show']);
     Route::get('complaints',[ComplaintController::class, 'getAllcomplaint']);
     Route::get('departments',[DepartmentController::class,'index']);

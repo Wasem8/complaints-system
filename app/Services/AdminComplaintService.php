@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Repositories\Contracts\AdminComplaintRepositoryInterface;
+use Illuminate\Support\Facades\Cache;
 
 class AdminComplaintService
 {
@@ -25,32 +26,43 @@ class AdminComplaintService
 
     public function updateStatus(int $id, string $status)
     {
-        $complaint = $this->complaints->find($id);
-        if (!$complaint) return null;
+        return Cache::lock('complaint_lock_' . $id, 10)->block(5, function () use ($id, $status) {
+            $complaint = $this->complaints->find($id);
 
-        $allowedTransitions = [
-            'pending' => ['processing', 'rejected'],
-            'processing' => ['done', 'rejected'],
-            'done' => [],
-            'rejected' => [],
-        ];
+            if (!$complaint) {
+                throw new \Exception("the complaint not found");
+            }
 
-        $current = $complaint->status;
+            $allowedTransitions = [
+                'pending'    => ['processing', 'rejected'],
+                'processing' => ['done', 'rejected'],
+                'done'       => [],
+                'rejected'   => [],
+            ];
 
-        if (!isset($allowedTransitions[$current])) {
-            return ['error' => 'Invalid current status'];
-        }
+            $current = $complaint->status;
 
-        if (!in_array($status, $allowedTransitions[$current])) {
-            return ['error' => "Cannot change status from {$current} to {$status}"];
-        }
+            if (!isset($allowedTransitions[$current])) {
+                throw new \Exception('Invalid current status');
+            }
 
-        if ($status === 'done' || $status === 'rejected') {
-            $complaint->handled_by = auth()->id();
-        }
+            if (!in_array($status, $allowedTransitions[$current], true)) {
+                throw new \Exception("Cannot change status from {$current} to {$status}");
+            }
 
-        return $this->complaints->updateStatus($complaint, $status);
+            if (in_array($status, ['done', 'rejected'], true)) {
+                $complaint->handled_by = auth()->id();
+            }
+
+             $this->complaints->updateStatus($complaint, $status);
+
+            Cache::forget("complaints_department_{$complaint->department_id}");
+
+
+            $complaint->refresh();
+        });
     }
+
 
 
 

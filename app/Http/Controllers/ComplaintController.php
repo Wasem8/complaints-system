@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ComplaintRequest;
+use App\Http\Requests\UpdateComplaintRequest;
 use App\Http\Requests\UpdateStatusRequest;
 use App\Http\Responses\Response;
 use App\Services\ComplaintService;
@@ -38,6 +39,27 @@ class ComplaintController extends Controller
 
         return response()->json($result, $result['status'] ? 201 : 400);
     }
+
+    public function update(UpdateComplaintRequest $request, int $id)
+    {
+        $data = $request->only([
+        'type',
+        'department_id',
+        'description',
+        'location_text',
+    ]);
+
+        $files = $request->file('files');
+
+        if($files && !is_array($files)) {
+            $files = [$files];
+        }
+
+        $result = $this->service->updateComplaint($id,$data, $files ?? []);
+
+        return response()->json($result, $result['status'] ? 201 : 400);
+    }
+
 
     public function index()
     {

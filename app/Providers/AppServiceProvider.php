@@ -16,6 +16,7 @@ use App\Repositories\Contracts\AdminComplaintRepositoryInterface;
 
 use App\Repositories\Contracts\ComplaintRepositoryInterface;
 use App\Repositories\Contracts\ComplaintStatusRepositoryInterface;
+use App\Repositories\Contracts\ComplaintTypeRepositoryInterface;
 use App\Repositories\Contracts\PermissionRepositoryInterface;
 
 use App\Repositories\Eloquent\AuditLogRepository;
@@ -24,6 +25,7 @@ use App\Repositories\Contracts\ReportRepositoryInterface;
 use App\Repositories\Eloquent\AdminComplaintRepository;
 use App\Repositories\Eloquent\ComplaintRepository;
 use App\Repositories\Eloquent\ComplaintStatusRepository;
+use App\Repositories\Eloquent\ComplaintTypeRepository;
 use App\Repositories\Eloquent\PermissionRepository;
 use App\Repositories\Eloquent\ReportRepository;
 use Illuminate\Support\ServiceProvider;
@@ -81,6 +83,10 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(
             ComplaintStatusRepositoryInterface::class,
             ComplaintStatusRepository::class
+        );
+        $this->app->bind(
+            ComplaintTypeRepositoryInterface::class,
+            ComplaintTypeRepository::class
         );
 
     }
