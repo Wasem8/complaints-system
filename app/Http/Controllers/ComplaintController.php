@@ -99,6 +99,24 @@ class ComplaintController extends Controller
         }
     }
 
+     public function showTimeLine(int $id) {
+        try {
+            $data = $this->statusService->getStatusTimeLine($id);
+
+            return Response::Success([
+                'status'  => 1,
+                'message' => 'Complaint status',
+                'data'    => $data,
+            ], 200);
+        } catch (ModelNotFoundException $e) {
+            return Response::Error([
+                'status'  => 0,
+                'message' => 'Complaint not found',
+                'data'    => null,
+            ], 404);
+        }
+    }
+
     public function updateStatus(UpdateStatusRequest $request, int $id)
     {
 
