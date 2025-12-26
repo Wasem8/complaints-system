@@ -19,6 +19,13 @@ class ComplaintRepository implements ComplaintRepositoryInterface
 
         return Complaint::create($data);
     }
+
+    public function updateComplaint(array $data, $complaint): Complaint
+    {
+        $complaint->update($data);
+
+        return $complaint;
+    }
     public function addFiles(Complaint $complaint, array $files): void
     {
         foreach ($files as $file) {
@@ -54,9 +61,16 @@ class ComplaintRepository implements ComplaintRepositoryInterface
         ->get();
     }
 
-    public function update(int $id, array $data): bool
+    public function updateStatus(Complaint $complaint, string $status): Complaint
     {
-        return Complaint::where('id', $id)->update($data);
+        $oldStatus = $complaint->status;
+        $complaint->status = $status;
+        $complaint->save();
+        $complaint->statusLogs()->create([
+            'old_status' => $oldStatus,
+            'new_status' => $status,
+        ]);
+        return $complaint;
     }
 
     public function getuserComplaints(int $userId): Collection

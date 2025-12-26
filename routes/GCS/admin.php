@@ -1,17 +1,15 @@
 <?php
 
 
-use App\Http\Controllers\AuditController;
-
+use App\Http\Controllers\Admin\AuditController;
 use App\Http\Controllers\Admin\ComplaintController;
+use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Api\FcmTokenController;
+use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\AuthController;
-
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\EmployeeController;
-use App\Http\Controllers\PermissionController;
-use App\Http\Controllers\UserManagementController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 

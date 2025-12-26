@@ -32,12 +32,28 @@ class ComplaintController extends Controller
 
     public function updateStatus(Request $request, $id)
     {
+        try {
         $request->validate(['status' => 'required|string']);
+        $data = $this->service->updateStatus($id,$request->status);
+            return response()->json([
+                'success' => true,
+                'message' => 'تم تحديث حالة الشكوى بنجاح',
+                'updated_by' => [
+                    'id'   => auth()->id(),
+                    'name' => auth()->user()->name,
+                ]
+            ]);
+        } catch (\Throwable $e) {
 
-        $data = $this->service->updateStatus($id, $request->status);
-        if (!$data) return Response::error(null, "Complaint not found", 404);
-
-        return Response::success($data, "Status");
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+                'updated_by' => [
+                    'id'   => auth()->id(),
+                    'name' => auth()->user()->name,
+                ]
+            ], 422);
+        }
     }
 
 

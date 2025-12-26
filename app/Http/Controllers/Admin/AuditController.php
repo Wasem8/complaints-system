@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
-use App\Models\AuditLog;
+use App\Http\Controllers\Controller;
 use App\Services\AuditService;
 use Illuminate\Http\Request;
 
