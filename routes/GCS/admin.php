@@ -5,7 +5,7 @@ use App\Http\Controllers\AuditController;
 
 use App\Http\Controllers\Admin\ComplaintController;
 use App\Http\Controllers\Admin\ReportController;
-
+use App\Http\Controllers\Api\FcmTokenController;
 use App\Http\Controllers\AuthController;
 
 use App\Http\Controllers\DepartmentController;
@@ -66,6 +66,8 @@ Route::prefix('admin')->middleware(['auth:api', 'role:admin'])->group(function (
         Route::get('/filter',[AuditController::class,'filter']);
         Route::get('/{id}', [AuditController::class, 'show']);
     });
+
+
 
 
 

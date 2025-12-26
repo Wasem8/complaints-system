@@ -33,7 +33,7 @@ class ComplaintService
         $complaint = $this->repo->create($data);
 
         Complaint_status_log::create([
-            'complaint_id' =>$complaint->id,
+            'complaint_id' => $complaint->id,
             'new_status' => 'pending',
             'note' => 'Complaint created',
         ]);
@@ -42,6 +42,18 @@ class ComplaintService
             $this->repo->addFiles($complaint, $files);
         }
 
+        if ($complaint->user && $complaint->user->fcm_token) {
+        app(FcmService::class)->sendNotification(
+            $complaint->user->fcm_token,
+            'تم استلام الشكوى',
+            'رقم الشكوى: ' . $complaint->tracking_number,
+            [
+                'type' => 'complaint_created',
+                'complaint_id' => $complaint->id,
+                'tracking_number' => $complaint->tracking_number,
+            ]
+        );
+    }
 
         return [
             'status' => true,
@@ -73,7 +85,7 @@ class ComplaintService
 
             $oldStatus = $complaint->status;
 
-            if($oldStatus === $newStatus) {
+            if ($oldStatus === $newStatus) {
                 throw new \Exception('الحالة نفسها، لا يوجد تغيير');
             }
 
@@ -99,10 +111,19 @@ class ComplaintService
 
 
 
-            if ($complaint->user) {
-                $complaint->user->notify(new ComplaintStatusUpdated($complaint, $newStatus));
-            }
-        });
+            if ($complaint->user?->fcm_token) {
+            $this->fcm->sendNotification(
+                $complaint->user->fcm_token,
+                'تم تحديث حالة الشكوى',
+                'رقم الشكوى: ' . $complaint->tracking_number,
+                [
+                    'type' => 'status_updated',
+                    'complaint_id' => $complaint->id,
+                    'new_status' => $newStatus,
+                ]
+            );
+        }
+    });
     }
 
     public function addMessage(int $complaintId, string $message, string $type = 'note'): array
@@ -128,13 +149,30 @@ class ComplaintService
 
         Cache::forget("complaints_department_{$complaint->department_id}");
 
-        if ($complaint->user) {
-            if ($type === 'note') {
-                $complaint->user->notify(new ComplaintNoteAdded($complaint, $message));
-            } else {
-                $complaint->user->notify(new ComplaintMoreInfoRequested($complaint, $message));
-            }
+        if ($complaint->user?->fcm_token) {
+
+        if ($type === 'note') {
+            $this->fcm->sendNotification(
+                $complaint->user->fcm_token,
+                'تمت إضافة ملاحظة',
+                'تمت إضافة ملاحظة على الشكوى رقم ' . $complaint->tracking_number,
+                [
+                    'type' => 'note_added',
+                    'complaint_id' => $complaint->id,
+                ]
+            );
+        } else {
+            $this->fcm->sendNotification(
+                $complaint->user->fcm_token,
+                'مطلوب معلومات إضافية',
+                'يرجى تزويدنا بمعلومات إضافية للشكوى رقم ' . $complaint->tracking_number,
+                [
+                    'type' => 'request_more_information',
+                    'complaint_id' => $complaint->id,
+                ]
+            );
         }
+    }
 
         return [
             'complaint_id' => $complaint->id,
@@ -148,9 +186,8 @@ class ComplaintService
     {
         $citizenId = auth()->id();
 
-        if(is_null($citizenId)) {
+        if (is_null($citizenId)) {
             return collect();
-
         }
         return $this->repo->getuserComplaints($citizenId);
     }

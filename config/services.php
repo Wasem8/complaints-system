@@ -34,5 +34,9 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
+    'firebase' => [
+    'project_id' => env('FIREBASE_PROJECT_ID'),
+    'credentials' => storage_path('app/firebase/my-complaint-7bb94-firebase-adminsdk-fbsvc-d71d55b67f.json'),
+],
 
 ];

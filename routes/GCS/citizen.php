@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\FcmTokenController;
 use App\Http\Controllers\ComplaintController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ComplaintTypeController;
@@ -15,7 +16,10 @@ Route::prefix('citizen')->group(function (){
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login',[AuthController::class,'loginCitizen'])->middleware('throttle:5,1');
     Route::post('/email-verification',[AuthController::class,'emailVerification']);
+
 });
+
+    Route::middleware('auth:api')->post('/fcm-token', [FcmTokenController::class, 'save']);
 
 
 Route::prefix('citizen')->middleware(['auth:api', 'role:citizen','check.status'])->group(function () {
