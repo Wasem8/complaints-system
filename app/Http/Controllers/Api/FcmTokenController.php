@@ -17,7 +17,7 @@ class FcmTokenController extends Controller
 
 
         $user->update([
-            'fcm_token' => $request->token
+            'fcm_token' => $request->fcm_token
         ]);
 
         return response()->json([

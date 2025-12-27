@@ -18,7 +18,7 @@ class FcmService
 
     public function sendNotificationToUser($user, string $title, string $body, array $data = [])
     {
-        // لا يوجد علاقة بعد الآن
+
         if (!$user->fcm_token) {
             return null;
         }

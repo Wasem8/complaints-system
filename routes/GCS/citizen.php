@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\FcmTokenController;
+use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\ComplaintController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ComplaintTypeController;
@@ -34,3 +35,15 @@ Route::prefix('citizen')->middleware(['auth:api', 'role:citizen','check.status']
     Route::get('types',[ComplaintTypeController::class,'index']);
 });
 
+
+Route::middleware('auth:api')->prefix('citizen/notifications')->group(function () {
+
+    Route::get('/', [NotificationController::class, 'index']);
+    Route::get('/unread', [NotificationController::class, 'unread']);
+    Route::get('/unread-count', [NotificationController::class, 'unreadCount']);
+
+    Route::post('/read-all', [NotificationController::class, 'markAllAsRead']);
+    Route::post('/{id}/read', [NotificationController::class, 'markAsRead']);
+
+    Route::delete('/{id}', [NotificationController::class, 'destroy']);
+});

@@ -25,6 +25,7 @@ class ComplaintService
     public function __construct(
         private ComplaintRepositoryInterface $repo,
         private ComplaintStatusRepositoryInterface $statusRepo,
+        private FcmService $fcm,
     ) {}
 
     public function submit(array $data, array $files = []): array
@@ -44,7 +45,7 @@ class ComplaintService
         }
 
         if ($complaint->user && $complaint->user->fcm_token) {
-        app(FcmService::class)->sendNotification(
+            $this->fcm->sendNotification(
             $complaint->user->fcm_token,
             'تم استلام الشكوى',
             'رقم الشكوى: ' . $complaint->tracking_number,
@@ -257,7 +258,7 @@ class ComplaintService
         $departmentId = $employee->department_id;
 
         return $this->repo->query()
-            ->with('user') 
+            ->with('user')
             ->where('id', $id)
             ->where('department_id', $departmentId)
             ->first();
