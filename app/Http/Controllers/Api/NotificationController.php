@@ -45,7 +45,10 @@ class NotificationController extends Controller
     {
         $notification = $request->user()
             ->notifications()
-            ->findOrFail($id);
+            ->find($id);
+        if (!$notification) {
+            return Response::Error(null, 'Notification not found');
+        }
         if($notification->read_at === null) {
             $notification->markAsRead();
 
@@ -70,7 +73,7 @@ class NotificationController extends Controller
     {
         $notification = $request->user()
             ->notifications()
-            ->findOrFail($id);
+            ->find($id);
 
         if (!$notification){
             return Response::Error(false, 'Notification not found');

@@ -25,7 +25,7 @@ class ComplaintService
     public function __construct(
         private ComplaintRepositoryInterface $repo,
         private ComplaintStatusRepositoryInterface $statusRepo,
-        private FcmService $fcm,
+        private NotificationService $notify,
     ) {}
 
     public function submit(array $data, array $files = []): array
@@ -45,8 +45,8 @@ class ComplaintService
         }
 
         if ($complaint->user && $complaint->user->fcm_token) {
-            $this->fcm->sendNotification(
-            $complaint->user->fcm_token,
+            $this->notify->send(
+                $complaint->user,
             'تم استلام الشكوى',
             'رقم الشكوى: ' . $complaint->tracking_number,
             [
