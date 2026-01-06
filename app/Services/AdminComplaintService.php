@@ -9,7 +9,7 @@ class AdminComplaintService
 {
     protected AdminComplaintRepositoryInterface $complaints;
 
-    public function __construct(AdminComplaintRepositoryInterface $complaints)
+    public function __construct(AdminComplaintRepositoryInterface $complaints,private NotificationService $notify)
     {
         $this->complaints = $complaints;
     }
@@ -60,6 +60,10 @@ class AdminComplaintService
 
 
             $complaint->refresh();
+
+            if ($complaint->user && $complaint->user->fcm_token) {
+                $this->notify->statusUpdated($complaint->user, $complaint, $status);
+            }
         });
     }
 

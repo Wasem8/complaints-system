@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Notifications\EmailVerificationNotification;
 use App\Repositories\Contracts\UserRepositoryInterface;
 use Ichtrojan\Otp\Otp;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
 
@@ -36,18 +37,18 @@ class AuthService
             'name'     => $data['name'],
             'email'    => $data['email'],
             'password' => Hash::make($data['password']),
+            'email_verified_at' => \Illuminate\Support\now()
         ]);
 
             $roleModel = Role::findByName($role,'api');
             $user->assignRole($roleModel);
 
-        $tokens = $this->tokens->createTokens($user);
-        $user->notify(new EmailVerificationNotification());
+//        $user->notify(new EmailVerificationNotification());
+
 
 
         return [
             'user'   => $this->formatUser($user),
-            'tokens' => $tokens,
             'message' => 'Registered successfully',
             'code' => 200,
         ];
@@ -61,7 +62,7 @@ class AuthService
             $user?->id,
             'auth',
             'login_attempt',
-            'محاولة تسجيل دخول فاشلة',
+            'محاولة تسجيل دخول',
             null,
             ['email' => $data['email']]
         ));
@@ -103,7 +104,8 @@ class AuthService
 
         $this->users->resetFailedAttempts($user);
 
-        if (!$user->hasRole($requiredRole)) {
+        $roles = Cache::remember("user_roles_{$user->id}", 3600, fn() => $user->roles->pluck('name')->toArray());
+        if (!in_array($requiredRole, $roles)) {
             return ['user' => null, 'message' => 'Forbidden for this role', 'code' => 403];
         }
 
@@ -112,6 +114,9 @@ class AuthService
         }
 
         $tokens = $this->tokens->createTokens($user);
+
+        Cache::remember("user_permissions_{$user->id}", 3600, fn() => $user->getAllPermissions()->pluck('name')->toArray());
+
 
         event(new AuditEvent(
             $user->id,

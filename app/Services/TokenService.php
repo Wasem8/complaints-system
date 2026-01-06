@@ -18,7 +18,9 @@ class TokenService
 
         $hash = hash('sha256', $raw);
 
-        RefreshToken::where('user_id', $user->id)->delete();
+        RefreshToken::where('user_id', $user->id)
+            ->where('expires_at', '<', now())
+            ->delete();
 
         RefreshToken::create([
             'user_id' => $user->id,

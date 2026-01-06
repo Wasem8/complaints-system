@@ -40,6 +40,18 @@ class Complaint extends Model
         return $this->belongsTo(Department::class);
     }
 
+    public function editNotification()
+    {
+        return $this->user->notifications()
+            ->whereJsonContains('data->data->type', 'request_more_information')
+            ->whereJsonContains('data->data->complaint_id', $this->id)
+            ->where('data->data->used_for_edit', false)
+            ->first();
+    }
 
+    public function canEdit(): bool
+    {
+        return $this->editNotification() !== null;
+    }
 
 }

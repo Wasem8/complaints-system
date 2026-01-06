@@ -60,6 +60,6 @@ class AuditLogRepository implements AuditLogRepositoryInterface
 
     public function index()
     {
-        return AuditLog::all();
+        return AuditLog::query()->latest()->get();
     }
 }

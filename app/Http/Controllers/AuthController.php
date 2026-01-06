@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\RateLimiter;
 class AuthController extends Controller
 {
     private AuthService $authService;
-    
+
 
     public function __construct(AuthService $authService)
     {
@@ -29,7 +29,6 @@ class AuthController extends Controller
             $data = $this->authService->register($validatedData, 'citizen');
             return Response::Success([
                 'user'   => $data['user'],
-                'tokens' => $data['tokens'] ?? null,
             ], $data['message'], $data['code']);
         } catch (\Throwable $exception) {
             $message = $exception->getMessage();

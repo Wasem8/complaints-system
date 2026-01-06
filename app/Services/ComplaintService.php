@@ -45,16 +45,7 @@ class ComplaintService
         }
 
         if ($complaint->user && $complaint->user->fcm_token) {
-            $this->notify->send(
-                $complaint->user,
-            'تم استلام الشكوى',
-            'رقم الشكوى: ' . $complaint->tracking_number,
-            [
-                'type' => 'complaint_created',
-                'complaint_id' => $complaint->id,
-                'tracking_number' => $complaint->tracking_number,
-            ]
-        );
+            $this->notify->complaintCreated($complaint->user, $complaint);
     }
 
         return [
@@ -78,6 +69,12 @@ class ComplaintService
                 throw new \Exception('unauthorised');
             }
 
+            if (!$complaint->canEdit()) {
+                throw new \Exception(
+                    'لا يمكنك تعديل الشكوى إلا بعد طلب معلومات إضافية من الجهة المختصة أو تم استخدام هذه المرة بالفعل'
+                );
+            }
+
             $complaint = $this->repo->updateComplaint($data, $complaint);
 
             if (!empty($files)) {
@@ -89,6 +86,13 @@ class ComplaintService
                 $complaint->status,
                 'complaint updated'
             );
+
+            $notification = $complaint->editNotification();
+            if ($notification) {
+                $notification->update([
+                    'data->data->used_for_edit' => true
+                ]);
+            }
 
             return [
                 'status' => true,
@@ -141,7 +145,7 @@ class ComplaintService
 
             $oldStatus = $complaint->status;
 
-            if ($oldStatus === $newStatus) {
+            if ($oldStatus === $status) {
                 throw new \Exception('الحالة نفسها، لا يوجد تغيير');
             }
 
@@ -152,8 +156,6 @@ class ComplaintService
             }
 
 
-            $this->repo->update($complaint->id, ['status' => $newStatus]);
-
             $this->repo->updateStatus($complaint, $status);
 
             Cache::forget("complaints_department_{$complaint->department_id}");
@@ -161,20 +163,9 @@ class ComplaintService
 
             $complaint->refresh();
 
-
-
-            if ($complaint->user?->fcm_token) {
-            $this->fcm->sendNotification(
-                $complaint->user->fcm_token,
-                'تم تحديث حالة الشكوى',
-                'رقم الشكوى: ' . $complaint->tracking_number,
-                [
-                    'type' => 'status_updated',
-                    'complaint_id' => $complaint->id,
-                    'new_status' => $newStatus,
-                ]
-            );
-        }
+            if ($complaint->user && $complaint->user->fcm_token) {
+                $this->notify->statusUpdated($complaint->user, $complaint, $status);
+            }
     });
 
     }
@@ -205,34 +196,12 @@ class ComplaintService
         if ($complaint->user?->fcm_token) {
 
         if ($type === 'note') {
-            $this->fcm->sendNotification(
-                $complaint->user->fcm_token,
-                'تمت إضافة ملاحظة',
-                'تمت إضافة ملاحظة على الشكوى رقم ' . $complaint->tracking_number,
-                [
-                    'type' => 'note_added',
-                    'complaint_id' => $complaint->id,
-                ]
-            );
+            $this->notify->noteAdded($complaint->user, $complaint);
+
         } else {
-            $this->fcm->sendNotification(
-                $complaint->user->fcm_token,
-                'مطلوب معلومات إضافية',
-                'يرجى تزويدنا بمعلومات إضافية للشكوى رقم ' . $complaint->tracking_number,
-                [
-                    'type' => 'request_more_information',
-                    'complaint_id' => $complaint->id,
-                ]
-            );
+            $this->notify->requestMoreInformation($complaint->user, $complaint);
         }
     }
-//        if ($complaint->user) {
-//            if ($type === 'note') {
-//                $complaint->user->notify(new ComplaintNoteAdded($complaint, $message));
-//            } else {
-//                $complaint->user->notify(new ComplaintMoreInfoRequested($complaint, $message));
-//            }
-//        }
 
         return [
             'complaint_id' => $complaint->id,
