@@ -23,6 +23,29 @@ class PermissionService
         return $this->permissions->allPermissions();
     }
 
+
+    public function createRoleWithPermissions(string $roleName, array $permissions)
+    {
+
+        $existingPermissions = $this->permissions->allPermissions()->pluck('name')->toArray();
+
+        $invalidPermissions = array_diff($permissions, $existingPermissions);
+
+        if (!empty($invalidPermissions)) {
+            throw new \InvalidArgumentException('The following permissions do not exist: ' . implode(', ', $invalidPermissions));
+        }
+
+        $role = $this->permissions->createRole($roleName);
+
+
+        if (!empty($permissions)) {
+            $this->permissions->assignPermissions($roleName, $permissions);
+        }
+
+
+        return $this->permissions->allRoles()->where('name', $roleName)->first();
+    }
+
     public function createRole(string $name)
     {
         return $this->permissions->createRole($name);

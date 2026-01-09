@@ -48,9 +48,9 @@ class DepartmentController extends Controller
 
         $deleted = $this->service->delete($id);
 
-        if (!$deleted)
-            return Response::Error(null,'Department not found',404);
-
+        if (!$deleted) {
+            return Response::Error(null, 'Department not found', 404);
+        }
         return Response::Success($deleted,'delete department success', 204);
     }
 }

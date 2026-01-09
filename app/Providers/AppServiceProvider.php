@@ -5,9 +5,11 @@ namespace App\Providers;
 
 use App\Models\AuditLog;
 use App\Models\Complaint;
+use App\Models\Complaint_status_log;
 use App\Models\Department;
 use App\Models\User;
 use App\Observers\ComplaintObserver;
+use App\Observers\ComplaintStatusLogObserver;
 use App\Observers\DepartmentObserver;
 use App\Observers\UserObserver;
 use App\Repositories\Contracts\AuditLogRepositoryInterface;
@@ -99,5 +101,6 @@ class AppServiceProvider extends ServiceProvider
         User::observe(UserObserver::class);
         Complaint::observe(ComplaintObserver::class);
         Department::observe(DepartmentObserver::class);
+        Complaint_status_log::observe(ComplaintStatusLogObserver::class);
     }
 }

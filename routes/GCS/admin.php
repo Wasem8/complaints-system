@@ -58,6 +58,7 @@ Route::prefix('admin')->middleware(['auth:api', 'role:admin'])->group(function (
 
     Route::post('/roles/{role}/assign', [PermissionController::class, 'assignPermissions']);
 
+    Route::post('roles-with-permissions', [PermissionController::class, 'createRoleWithPermissions']);
 
     Route::prefix('audit-logs')->group(function () {
         Route::get('/',[AuditController::class,'index']);
@@ -94,6 +95,8 @@ Route::prefix('admin')->middleware(['auth:api', 'role:admin'])->group(function (
     // Export
     Route::get('/export/csv', [ReportController::class, 'exportCSV']);
     Route::get('/export/pdf', [ReportController::class, 'exportPDF']);
+
+    Route::post('complaints/{id}/addMessage',[App\Http\Controllers\ComplaintController::class, 'addMessageToComplaint']);
 });
 
 

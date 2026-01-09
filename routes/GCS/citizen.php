@@ -15,7 +15,7 @@ Route::get('/user', function (Request $request) {
 
 Route::prefix('citizen')->group(function (){
     Route::post('/register', [AuthController::class, 'register']);
-    Route::post('/login',[AuthController::class,'loginCitizen'])->middleware('throttle:5,1');
+    Route::post('/login',[AuthController::class,'loginCitizen'])->middleware('throttle:1000,1');
     Route::post('/email-verification',[AuthController::class,'emailVerification']);
 
 });

@@ -25,7 +25,8 @@ class UpdateUserRequest extends FormRequest
             'name' => 'sometimes|string|max:255',
             'email' => 'sometimes|email|unique:users,email,',
             'password' => 'sometimes|string|min:6',
-            'role' => 'sometimes|string|in:admin,employee,citizen'
+            'role' => 'sometimes|string|in:admin,employee,citizen',
+            'department_id' => 'required_if:role,employee|nullable|exists:departments,id',
         ];
     }
 }

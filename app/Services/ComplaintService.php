@@ -183,14 +183,6 @@ class ComplaintService
             $message
         );
 
-        $this->audit(
-            'complaints',
-            $type === 'note' ? 'add_note' : 'request_more_info',
-            $type !== 'note' ? 'تمت إضافة ملاحظة للشكوى' : 'تم طلب معلومات إضافية',
-            null,
-            ['message' => $message]
-        );
-
         Cache::forget("complaints_department_{$complaint->department_id}");
 
         if ($complaint->user?->fcm_token) {

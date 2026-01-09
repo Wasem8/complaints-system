@@ -28,6 +28,24 @@ class PermissionController extends Controller
         return Response::success($data,'success');
     }
 
+
+    public function createRoleWithPermissions(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string',
+            'permissions' => 'required|array'
+        ]);
+
+        try {
+            $role = $this->service->createRoleWithPermissions($request->name, $request->permissions);
+            return Response::success($role, 'Role created with permissions successfully');
+        } catch (\InvalidArgumentException $e) {
+            return Response::error($e->getMessage(), 422);
+        }
+    }
+
+
+
     public function createRole(Request $request)
     {
         $request->validate(['name' => 'required']);

@@ -32,7 +32,7 @@ class DepartmentObserver
             'department',
             'updated',
             'department updated',
-            null,
+            $department->getOriginal(),
             $department->toArray()
         ));
     }
@@ -47,7 +47,7 @@ class DepartmentObserver
             'department',
             'deleted',
             'department deleted',
-            null,
+            $department->getOriginal(),
             $department->toArray()
         ));
     }

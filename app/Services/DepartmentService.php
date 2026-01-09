@@ -7,14 +7,10 @@ use App\Repositories\Contracts\DepartmentRepositoryInterface;
 class DepartmentService
 {
     protected DepartmentRepositoryInterface $departments;
-    protected AuditService $audit;
 
-    public function __construct(DepartmentRepositoryInterface $departments,
-        AuditService $audit
-    )
+    public function __construct(DepartmentRepositoryInterface $departments)
     {
         $this->departments = $departments;
-        $this->audit = $audit;
     }
 
     public function getAll()
@@ -37,8 +33,6 @@ class DepartmentService
             return null;
         }
 
-        $oldData = $department->toArray();
-
         $updated = $this->departments->update($department, $data);
 
 
@@ -52,8 +46,6 @@ class DepartmentService
         if (!$department) {
             return null;
         }
-
-        $oldData = $department->toArray();
 
         $this->departments->delete($department);
 

@@ -2,58 +2,59 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use App\Models\User;
 use App\Models\Complaint;
-use App\Models\Complaint_file;
+use App\Models\Department;
+use App\Models\User;
 use App\Models\Complaint_status_log;
-use App\Models\ComplaintFile;
-use App\Models\ComplaintStatusLog;
+use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
 class ComplaintSeeder extends Seeder
 {
     public function run(): void
     {
-        // Get all users with the role 'employee'
-        $employees = User::role('employee')->get();
+        $users = User::whereNotNull('department_id')->get();
 
-        if ($employees->isEmpty()) {
-            $this->command->info('No users with employee role found!');
+        if ($users->isEmpty()) {
+            $this->command->warn('No users with department found.');
             return;
         }
 
-        $employees->each(function ($user) {
-            // Each employee has 2 complaints
-            Complaint::factory(2)->create([
-                'user_id' => $user->id,
-                'department_id' => rand(1, 5), // random department
-            ])->each(function ($complaint) use ($user) {
+        $faker = \Faker\Factory::create();
 
-                // Add 1-2 files per complaint
-                for ($i = 0; $i < rand(1, 2); $i++) {
-                    Complaint_file::create([
-                        'complaint_id' => $complaint->id,
-                        'file_path' => 'uploads/dummy-file-' . Str::random(5) . '.jpg',
-                        'file_type' => 'image',
-                    ]);
-                }
+        $citizens = User::role('citizen')->get(); // فقط المواطنين
+        $departments = Department::all();
 
-                // Randomly update status
-                $statuses = ['processing', 'done', 'rejected'];
-                $newStatus = $statuses[array_rand($statuses)];
+        $types = [
+            'service_missing',
+            'power_outage',
+            'corruption',
+            'employee_misconduct',
+            'technical_issue',
+        ];
 
-                // Update complaint status
-                $complaint->status = $newStatus;
-                $complaint->save();
+            for ($i = 1; $i <= 20; $i++) {
+                $citizen = $citizens->random();
+                $department = $departments->random();
 
-                // Log status update
-                Complaint_status_log::create([
-                    'complaint_id' => $complaint->id,
-                    'new_status' => $newStatus,
-                    'note' => 'تم تحديث الحالة تلقائياً بواسطة Seeder',
+                $complaint =  Complaint::create([
+                    'user_id' => $citizen->id,
+                    'department_id' => $department->id,
+                    'type' => $faker->randomElement($types),
+                    'description' => $faker->paragraph(3),
+                    'location_text' => $faker->address(),
+                    'status' => 'pending',
+                    'tracking_number' => 'CMP-' . now()->format('YmdHis') . '-' . Str::upper(Str::random(6)),
+
                 ]);
-            });
-        });
+
+            Complaint_status_log::create([
+                'complaint_id' => $complaint->id,
+                'new_status' => 'pending',
+                'note' => 'Complaint created by seeder',
+            ]);
+        }
+
+        $this->command->info('✅ 20 complaints seeded successfully.');
     }
 }
