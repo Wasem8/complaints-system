@@ -37,8 +37,8 @@ class NotificationService
     {
         return $this->send(
             $user,
-            'تم استلام الشكوى',
-            'رقم الشكوى: ' . $complaint->tracking_number,
+            'Complaint Received Successfully',
+            'Ref:' . $complaint->tracking_number,
             [
                 'type' => 'complaint_created',
                 'complaint_id' => $complaint->id,
@@ -52,8 +52,8 @@ class NotificationService
     {
         return $this->send(
             $user,
-            'مطلوب معلومات إضافية',
-            'يرجى تزويدنا بمعلومات إضافية للشكوى رقم: ' . $complaint->tracking_number,
+            'More Inforamtion Required',
+            'Please Add More Info To Complaint With Ref:' . $complaint->tracking_number,
             [
                 'type' => 'request_more_information',
                 'complaint_id' => $complaint->id,
@@ -66,8 +66,8 @@ class NotificationService
     {
         return $this->send(
             $user,
-            'تمت إضافة ملاحظة',
-            'تمت إضافة ملاحظة على الشكوى رقم: ' . $complaint->tracking_number,
+            'Note Added Successfully',
+            'Note Added To Complaint With Ref: ' . $complaint->tracking_number,
             [
                 'type' => 'note_added',
                 'complaint_id' => $complaint->id,
@@ -79,10 +79,10 @@ class NotificationService
     {
         return $this->send(
             $user,
-            'تحديث حالة الشكوى',
-            'تم تحديث حالة الشكوى رقم: ' . $complaint->tracking_number,
+            'Status Changed Successfully',
+            'Stauts Changed to Complaint With Ref: ' . $complaint->tracking_number,
             [
-                'type' => 'complaint_updated',
+                'type' => 'complaint_changed',
                 'complaint_id' => $complaint->id,
                 'new_status' => $status,
             ]

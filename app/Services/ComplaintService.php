@@ -71,8 +71,7 @@ class ComplaintService
 
             if (!$complaint->canEdit()) {
                 throw new \Exception(
-                    'لا يمكنك تعديل الشكوى إلا بعد طلب معلومات إضافية من الجهة المختصة أو تم استخدام هذه المرة بالفعل'
-                );
+                    'You cannot modify the complaint unless additional information has been requested by the competent authority, or this attempt has already been used.'                );
             }
 
             $complaint = $this->repo->updateComplaint($data, $complaint);

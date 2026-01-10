@@ -37,7 +37,7 @@ class AuthService
             'name'     => $data['name'],
             'email'    => $data['email'],
             'password' => Hash::make($data['password']),
-            'email_verified_at' => now(),
+            'email_verified_at' => \Illuminate\Support\now(),
         ]);
 
             $roleModel = Role::findByName($role,'api');
